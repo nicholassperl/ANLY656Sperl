@@ -1,0 +1,503 @@
+
+ ============================================================ 
+ ******** Step 1: Reading Data and Preparing Data Map ******* 
+ ============================================================ 
+Data loaded: 3168 observations 21 columns.
+ =============== DATA MAP ===============
+  meanfreq. Interval (0, 1.0)
+  sd....... Interval (0, 1.0)
+  median... Interval (0, 1.0)
+  Q25...... Interval (0, 1.0)
+  Q75...... Interval (0, 1.0)
+  IQR...... Interval (0, 1.0)
+  skew..... Interval (0, 35.0)
+  kurt..... Interval (0, 1310.0)
+  spent.... Interval (0, 1.0)
+  sfm...... Interval (0, 1.0)
+  mode..... Interval (0, 1.0)
+  centroid. Interval (0, 1.0)
+  meanfun.. Interval (0, 1.0)
+  minfun... Interval (0, 1.0)
+  maxfun... Interval (0, 1.0)
+  meandom.. Interval (0, 3.0)
+  mindom... Interval (0, 1.0)
+  maxdom... Interval (0, 22.0)
+  dfrange.. Interval (0, 22.0)
+  modindx.. Interval (0, 1.0)
+  gender... Binary   ('female', 'male')
+ === Data Map has 21 attribute columns === 
+Interval attribute pairs with |r| >= 0.90:
+  meanfreq........ centroid........ r =  1.000
+  maxdom.......... dfrange......... r =  1.000
+  skew............ kurt............ r =  0.977
+  median.......... centroid........ r =  0.925
+  meanfreq........ median.......... r =  0.925
+  Q25............. centroid........ r =  0.911
+  meanfreq........ Q25............. r =  0.911
+
+ ============================================================ 
+ ******* Step 2: ReplaceImputeEncode (RIE) Processing ******* 
+ ============================================================ 
+
+
+********** Data Preprocessing ***********
+Features Dictionary Contains:
+20 Interval, 
+1 Binary, 
+0 Nominal, and 
+0 Excluded Attribute(s).
+
+Data contains 3168 observations & 21 columns.
+
+
+Attribute Counts
+............... Missing  Outliers
+meanfreq..         0         0
+sd........         0         0
+median....         0         0
+Q25.......         0         0
+Q75.......         0         0
+IQR.......         0         0
+skew......         0         0
+kurt......         0         0
+spent.....         0         0
+sfm.......         0         0
+mode......         0         0
+centroid..         0         0
+meanfun...         0         0
+minfun....         0         0
+maxfun....         0         0
+meandom...         0         0
+mindom....         0         0
+maxdom....         0         0
+dfrange...         0         0
+modindx...         0         0
+gender....         0         0
+
+encoded_df created from gender_voice_data.csv containing 3168 cases & 21  columns, including the target 'gender'
+
+ ============================================================ 
+ *****  STEP 3: Logistic Regression using All Attributes **** 
+ ============================================================ 
+
+Predicting 'gender' using 'All' Attributes in encoded_df
+
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                 gender   No. Observations:                 3168
+Model:                            GLM   Df Residuals:                     3148
+Model Family:                Binomial   Df Model:                           19
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -277.43
+Date:                Wed, 30 Sep 2026   Deviance:                       554.85
+Time:                        23:24:37   Pearson chi2:                 2.65e+04
+No. Iterations:                   100   Pseudo R-squ. (CS):             0.7021
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         -1.0292      0.181     -5.687      0.000      -1.384      -0.674
+meanfreq     190.9082    173.349      1.101      0.271    -148.849     530.666
+sd             0.5094      0.583      0.874      0.382      -0.633       1.652
+median        -0.3316      0.470     -0.706      0.480      -1.252       0.589
+Q25         9.041e+06   1.07e+07      0.841      0.400    -1.2e+07    3.01e+07
+Q75         -4.39e+06   5.22e+06     -0.841      0.400   -1.46e+07    5.84e+06
+IQR         7.946e+06   9.44e+06      0.841      0.400   -1.06e+07    2.65e+07
+skew           0.5352      0.717      0.746      0.456      -0.871       1.941
+kurt          -0.9795      0.612     -1.600      0.110      -2.180       0.221
+spent          1.8554      0.463      4.009      0.000       0.948       2.763
+sfm           -2.1321      0.456     -4.676      0.000      -3.026      -1.238
+mode           0.2459      0.171      1.435      0.151      -0.090       0.582
+centroid    -190.6781    173.363     -1.100      0.271    -530.463     149.107
+meanfun       -5.3788      0.280    -19.217      0.000      -5.927      -4.830
+minfun         0.7229      0.173      4.172      0.000       0.383       1.062
+maxfun        -0.0384      0.200     -0.192      0.848      -0.431       0.354
+meandom        0.0635      0.228      0.279      0.780      -0.383       0.510
+mindom     -3.328e+07   3.03e+07     -1.100      0.271   -9.26e+07     2.6e+07
+maxdom      1.852e+09   1.68e+09      1.100      0.271   -1.45e+09    5.15e+09
+dfrange    -1.851e+09   1.68e+09     -1.100      0.271   -5.15e+09    1.45e+09
+modindx       -0.3831      0.190     -2.022      0.043      -0.755      -0.012
+==============================================================================
+NOTE: The ALL design matrix has rank 20 of 21 columns. centroid equals meanfreq,
+      and, up to rounding in the file, IQR = Q75 - Q25 and dfrange = maxdom - mindom.
+      Coefficients of those attributes are not identified and should not be
+      interpreted; predictions and accuracy are still valid.
+
+Model Metrics
+Observations...............      3168
+Accuracy...................    0.9738
+Precision..................    0.9711
+Sensitivity (Recall).......    0.9766
+Specificity (Selectivity)..    0.9710
+F1-Score...................    0.9739
+MISC (Misclassification)...      2.6%
+     class 0...............      2.9%
+     class 1...............      2.3%
+
+
+     Confusion
+       Matrix     Class 0   Class 1  
+Class 0.....      1538        46
+Class 1.....        37      1547
+
+Logistic Regression using 'ALL' attributes ****
+Accuracy for All Features Logistic Reg:  0.9738
+Total Misclassifications: 83/3168:     0.0262
+
+
+ ============================================================ 
+ **************** STEP 4: STEPWISE SELECTION **************** 
+ ============================================================ 
+
+Add  IQR                            with p-value 4.00556e-196
+Add  meanfun                        with p-value 3.96257e-99
+Add  minfun                         with p-value 2.1901e-23
+Add  kurt                           with p-value 2.20325e-12
+Add  sfm                            with p-value 4.22206e-08
+Add  spent                          with p-value 3.49835e-05
+Add  modindx                        with p-value 0.0076806
+ -------------------------------------------------------------------------------- 
+ Stepwise selected 7 out of 20 features.
+ ================================================================================ 
+
+
+Stepwise Logistic Regression 
+
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                 gender   No. Observations:                 3168
+Model:                            GLM   Df Residuals:                     3160
+Model Family:                Binomial   Df Model:                            7
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -280.23
+Date:                Wed, 30 Sep 2026   Deviance:                       560.46
+Time:                        23:24:37   Pearson chi2:                 2.96e+04
+No. Iterations:                     9   Pseudo R-squ. (CS):             0.7016
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         -0.9325      0.156     -5.964      0.000      -1.239      -0.626
+IQR            2.4955      0.196     12.730      0.000       2.111       2.880
+meanfun       -5.4182      0.276    -19.629      0.000      -5.959      -4.877
+minfun         0.7006      0.154      4.557      0.000       0.399       1.002
+kurt          -0.5677      0.146     -3.876      0.000      -0.855      -0.281
+sfm           -1.7373      0.291     -5.968      0.000      -2.308      -1.167
+spent          1.5338      0.361      4.250      0.000       0.826       2.241
+modindx       -0.4036      0.151     -2.666      0.008      -0.700      -0.107
+==============================================================================
+
+Model Metrics
+Observations...............      3168
+Accuracy...................    0.9754
+Precision..................    0.9736
+Sensitivity (Recall).......    0.9773
+Specificity (Selectivity)..    0.9735
+F1-Score...................    0.9754
+MISC (Misclassification)...      2.5%
+     class 0...............      2.7%
+     class 1...............      2.3%
+
+
+     Confusion
+       Matrix     Class 0   Class 1  
+Class 0.....      1542        42
+Class 1.....        36      1548
+
+Stepwise Logistic Regression selected 7 attributes,
+Accuracy.............................. 97.5%
+Total Misclassifications: 78/3168... 2.5%
+
+
+ ============================================================ 
+ ************ STEP 5: L1 REGULARIZATION SELECTION *********** 
+ ============================================================ 
+Number of Selected Attributes:  15
+
+
+Coefficients:
+Intercept..        -0.9734
+sd.........         0.3808
+median.....        -0.2227
+Q75........         0.0464
+IQR........         2.2458
+skew.......         0.2935
+kurt.......        -0.7748
+spent......         1.7180
+sfm........        -2.0193
+mode.......         0.2326
+meanfun....        -5.3429
+minfun.....         0.7082
+maxfun.....        -0.0239
+meandom....         0.0111
+mindom.....        -0.0242
+modindx....        -0.3755
+
+Model Metrics
+Observations...............      3168
+Coefficients...............        16
+DF Error...................      3152
+Iterations.................        49
+Mean Absolute Error........    0.0451
+Avg Squared Error..........    0.0208
+Accuracy...................    0.9744
+Precision..................    0.9718
+Recall (Sensitivity).......    0.9773
+Specificity................    0.9716
+F1-Score...................    0.9745
+Total Misclassifications...        81
+MISC (Misclassification)...      2.6%
+     class 0                     2.8%
+     class 1                     2.3%
+
+
+     Confusion     Class     Class
+       Matrix          0         1
+  Class 0.....      1539        45
+  Class 1.....        36      1548
+
+L1 Logistic Regression using c=5.0 selected 15 attributes
+Accuracy............................. 97.4%
+Total Misclassifications: 81/3168..  2.6%
+
+
+ ============================================================ 
+ ***************** STEP 6: L2 REGULARIZATION **************** 
+ ============================================================ 
+
+
+Coefficients:
+Intercept..        -0.8414
+meanfreq...         0.0031
+sd.........         0.2892
+median.....        -0.2288
+Q25........        -0.8938
+Q75........         0.5411
+IQR........         1.3160
+skew.......        -0.0131
+kurt.......        -0.5076
+spent......         1.3259
+sfm........        -1.6243
+mode.......         0.2140
+centroid...         0.0031
+meanfun....        -4.9921
+minfun.....         0.6419
+maxfun.....        -0.0395
+meandom....         0.0157
+mindom.....        -0.0333
+maxdom.....        -0.0151
+dfrange....        -0.0145
+modindx....        -0.3738
+
+Model Metrics
+Observations...............      3168
+Coefficients...............        21
+DF Error...................      3147
+Iterations.................         9
+Mean Absolute Error........    0.0480
+Avg Squared Error..........    0.0211
+Accuracy...................    0.9747
+Precision..................    0.9712
+Recall (Sensitivity).......    0.9785
+Specificity................    0.9710
+F1-Score...................    0.9748
+Total Misclassifications...        80
+MISC (Misclassification)...      2.5%
+     class 0                     2.9%
+     class 1                     2.1%
+
+
+     Confusion     Class     Class
+       Matrix          0         1
+  Class 0.....      1538        46
+  Class 1.....        34      1550
+
+L2 Logistic Regression using c=1.0 selected 20 attributes
+Accuracy............................. 97.5%
+Total Misclassifications: 80/3168..  2.5%
+
+
+ ============================================================ 
+ ******** STEP 7: HYPERPARAMETER OPTIMIZATION SUMMARY ******* 
+ ============================================================ 
+
+ ============================================
+ MODEL               ACCURACY          MISC
+ ALL................  97.38%         83/ 3168
+ Stepwise...........  97.54%         78/ 3168
+ L1 Reg.............  97.44%         81/ 3168
+ L2 Reg.............  97.47%         80/ 3168
+ ============================================
+
+ ============================================
+ ATTRIBUTE............... STEPWISE  L1    L2
+ --------------------------------------------
+meanfreq.................                  X      
+sd.......................           X      X      
+median...................           X      X      
+Q25......................                  X      
+Q75......................           X      X      
+IQR......................    X      X      X      
+skew.....................           X      X      
+kurt.....................    X      X      X      
+spent....................    X      X      X      
+sfm......................    X      X      X      
+mode.....................           X      X      
+centroid.................                  X      
+meanfun..................    X      X      X      
+minfun...................    X      X      X      
+maxfun...................           X      X      
+meandom..................           X      X      
+mindom...................           X      X      
+maxdom...................                  X      
+dfrange..................                  X      
+modindx..................    X      X      X      
+ --------------------------------------------
+ Selected................    7     15     20
+ ============================================
+
+ ============================================================ 
+ **************** STEP 8: HOLD-OUT VALIDATION *************** 
+ ============================================================ 
+Best model: Stepwise with 7 features
+
+
+
+Model Metrics..........       Training     Validation
+Observations...........           2217            951
+Coefficients...........              8              8
+DF Error...............           2209            943
+Iterations.............              9              9
+Mean Absolute Error....         0.0427         0.0481
+Avg Squared Error......         0.0202         0.0231
+Accuracy...............         0.9752         0.9706
+Precision..................     0.9739         0.9647
+Recall (Sensitivity).......     0.9766         0.9768
+Specificity................     0.9738         0.9643
+F1-score...................     0.9752         0.9707
+Total Misclassifications...         55             28
+MISC (Misclassification)...       2.5%           2.9%
+     class 0...............       2.6%           3.6%
+     class 1...............       2.3%           2.3%
+
+
+Training                  Class     Class
+Confusion Matrix              0         1
+Class 0..............      1079        29
+Class 1..............        26      1083
+
+
+Validation                Class     Class
+Confusion Matrix              0         1
+Class 0..............       459        17
+Class 1..............        11       464
+
+               precision    recall  f1-score   support
+
+           0       0.98      0.96      0.97       476
+           1       0.96      0.98      0.97       475
+
+    accuracy                           0.97       951
+   macro avg       0.97      0.97      0.97       951
+weighted avg       0.97      0.97      0.97       951
+
+
+Misclassification overfit_ratio  (misc_val/misc_train): 1.19
+
+ ============================================================ 
+ ************** STEP 9: K-FOLD CROSS VALIDATION ************* 
+ ============================================================ 
+
+
+ ====== 2-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0246 +/-0.0101
+  Test  Avg. MISC..... 0.0262 +/-0.0006
+  Mean Misc Ratio..... 1.1136 +/-0.4825
+  ======================================= 
+Equivalent to 2 splits each with 1584/1584 Cases
+
+
+ ====== 3-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0251 +/-0.0051
+  Test  Avg. MISC..... 0.0265 +/-0.0015
+  Mean Misc Ratio..... 1.0686 +/-0.2492
+  ======================================= 
+Equivalent to 3 splits each with 2112/1056 Cases
+
+
+ ====== 4-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0253 +/-0.0031
+  Test  Avg. MISC..... 0.0249 +/-0.0048
+  Mean Misc Ratio..... 0.9932 +/-0.2545
+  ======================================= 
+Equivalent to 4 splits each with 2376/792 Cases
+
+
+ ====== 5-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0249 +/-0.0030
+  Test  Avg. MISC..... 0.0252 +/-0.0097
+  Mean Misc Ratio..... 1.0252 +/-0.4913
+  ======================================= 
+Equivalent to 5 splits each with 2534/634 Cases
+
+
+ ====== 6-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0253 +/-0.0029
+  Test  Avg. MISC..... 0.0253 +/-0.0087
+  Mean Misc Ratio..... 1.0078 +/-0.4365
+  ======================================= 
+Equivalent to 6 splits each with 2640/528 Cases
+
+
+ ====== 7-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0251 +/-0.0026
+  Test  Avg. MISC..... 0.0252 +/-0.0143
+  Mean Misc Ratio..... 1.0202 +/-0.6609
+  ======================================= 
+Equivalent to 7 splits each with 2715/453 Cases
+
+
+ ====== 8-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0247 +/-0.0023
+  Test  Avg. MISC..... 0.0259 +/-0.0165
+  Mean Misc Ratio..... 1.0629 +/-0.7436
+  ======================================= 
+Equivalent to 8 splits each with 2772/396 Cases
+
+
+ ====== 9-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0249 +/-0.0027
+  Test  Avg. MISC..... 0.0256 +/-0.0161
+  Mean Misc Ratio..... 1.0420 +/-0.7367
+  ======================================= 
+Equivalent to 9 splits each with 2816/352 Cases
+
+
+ ====== 10-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0249 +/-0.0018
+  Test  Avg. MISC..... 0.0249 +/-0.0170
+  Mean Misc Ratio..... 1.0116 +/-0.7158
+  ======================================= 
+Equivalent to 10 splits each with 2851/317 Cases
+
+ ============================================================ 
+ ************ STEP 10: FINAL MODEL INTERPRETATION *********** 
+ ============================================================ 
+Final model: Stepwise logistic regression with 7 features (event = gender = 1, 'male'; gender = 0 is 'female').
+Hold-out validation misclassification: 2.9% (overfit ratio 1.19).
+10-fold CV misclassification: 2.5% (mean overfit ratio 1.01).
+A single 70/30 split is noisy; the 10-fold ratio is the more reliable overfitting check.
+
+ Top 5 attributes by |coefficient|
+ ATTRIBUTE.............  COEF  ODDS RATIO  PER
+ meanfun............. -5.418      0.004  1 std. dev. (0.0323)
+ IQR.................  2.495     12.127  1 std. dev. (0.04278)
+ sfm................. -1.737      0.176  1 std. dev. (0.1775)
+ spent...............  1.534      4.636  1 std. dev. (0.04497)
+ minfun..............  0.701      2.015  1 std. dev. (0.01922)
+
+Hold-out error by class: female (0) 3.6%, male (1) 2.3%
+
+ ============================================================ 
+ ****** Analysis of Binary Logistic Reg. Data Complete ****** 
+ ============================================================ 
