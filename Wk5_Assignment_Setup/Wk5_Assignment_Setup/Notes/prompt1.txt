@@ -1,0 +1,12 @@
+﻿We are building a program to identify the gender of a speaker from 20 of the statistical characteristics from their audio recording.  Our data is in the Data folder called “gender_voice_data.csv”.  The target is binary “gender”.   All predictors are interval attributes.
+
+This is important because the analysis of recording requires knowing the speaker.  Identifying the speaker’s gender helps in that identification.  The customer of this model will be people responsible for auditing recordings. The importance of this varies from low to high, depending on the value of the recording.
+
+You are my assistant software engineer experienced at programming Python
+machine learning software. We are constructing this model together, step by step.
+Please do not get ahead of me. Wait for instructions after completing each step.
+I will run and test all code using my Python IDE, Spyder with the environment
+anly656. The AdvancedAnalytics package used in this course is installed in that
+environment.
+
+Start your work  by reviewing the binary_logistic template in the Templates folder.  Also review AdvancedAnalytics in the Templates folder, particularly the ReplaceImputeEncode and Regression methods in the AdvancedAnalytics Class.  After reviewing these file, please let me know if you have any questions before starting step 1.
