@@ -1,0 +1,494 @@
+
+ ============================================================ 
+ ************ Step 1: Reading Credit Default Data *********** 
+ ============================================================ 
+Data loaded: 8000 observations and 32 columns.
+
+ ============================================================ 
+ ******* Step 2: ReplaceImputeEncode (RIE) Processing ******* 
+ ============================================================ 
+
+=============== DATA MAP ===============
+  Customer....... ID       (0.99, 29998.01)
+  Default........ Binary   (0, 1)
+  card_class..... Nominal  (1, 2, 3)
+  Gender......... Binary   (1.0, 2.0)
+  Education...... Nominal  (0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0)
+  Marital_Status. Nominal  (0, 1, 2, 3)
+  Age............ Interval (20.99, 75.01)
+  Credit_Limit... Interval (299.99, 27400.01)
+  Jun_Status..... Interval (-2.01, 8.01)
+  May_Status..... Interval (-2.01, 7.01)
+  Apr_Status..... Interval (-2.01, 8.01)
+  Mar_Status..... Interval (-2.01, 8.01)
+  Feb_Status..... Interval (-2.01, 8.01)
+  Jan_Status..... Interval (-2.01, 8.01)
+  Jun_Bill....... Interval (-492.01, 20166.18)
+  May_Bill....... Interval (-2309.4, 19896.72)
+  Apr_Bill....... Interval (-5378.44, 19800.82)
+  Mar_Bill....... Interval (-1731.08, 18148.99)
+  Feb_Bill....... Interval (-1812.85, 18737.51)
+  Jan_Bill....... Interval (-11614.43, 16990.6)
+  Jun_Payment.... Interval (-0.01, 16872.85)
+  May_Payment.... Interval (-0.01, 41966.21)
+  Apr_Payment.... Interval (-0.01, 17381.44)
+  Mar_Payment.... Interval (-0.01, 9092.15)
+  Feb_Payment.... Interval (-0.01, 11319.59)
+  Jan_Payment.... Interval (-0.01, 15150.64)
+  Jun_PayPercent. Interval (-0.01, 1.01)
+  May_PayPercent. Interval (-0.01, 1.01)
+  Apr_PayPercent. Interval (-0.01, 1.01)
+  Mar_PayPercent. Interval (-0.01, 1.01)
+  Feb_PayPercent. Interval (-0.01, 1.01)
+  Jan_PayPercent. Interval (-0.01, 1.01)
+ === Data Map has 31 attribute columns === 
+
+
+********** Data Preprocessing ***********
+Features Dictionary Contains:
+26 Interval, 
+2 Binary, 
+3 Nominal, and 
+1 Excluded Attribute(s).
+
+Data contains 8000 observations & 32 columns.
+
+
+Attribute Counts
+..................... Missing  Outliers
+Customer........         0         0
+Default.........         0         0
+card_class......         0         0
+Gender..........       832         0
+Education.......      1182         0
+Marital_Status..         0         0
+Age.............      1592         0
+Credit_Limit....         0         0
+Jun_Status......         0         0
+May_Status......         0         0
+Apr_Status......         0         0
+Mar_Status......         0         0
+Feb_Status......         0         0
+Jan_Status......         0         0
+Jun_Bill........         0         0
+May_Bill........         0         0
+Apr_Bill........         0         0
+Mar_Bill........         0         0
+Feb_Bill........         0         0
+Jan_Bill........         0         0
+Jun_Payment.....         0         0
+May_Payment.....         0         0
+Apr_Payment.....         0         0
+Mar_Payment.....         0         0
+Feb_Payment.....         0         0
+Jan_Payment.....         0         0
+Jun_PayPercent..         0         0
+May_PayPercent..         0         0
+Apr_PayPercent..         0         0
+Mar_PayPercent..         0         0
+Feb_PayPercent..         0         0
+Jan_PayPercent..         0         0
+
+encoded_df    : 8000 cases and 42 columns,
+                including target.
+
+Target 'Default' class counts:
+  0..............  4000  50.0%
+  1..............  4000  50.0%
+
+
+ ============================================================ 
+ ** Step 3: Kitchen Sink Decision Tree (Default Parameters) * 
+ ============================================================ 
+Fitting kitchen sink tree using entire dataset
+
+Model Metrics
+Observations...............      8000
+Features...................        41
+Maximum Tree Depth.........      None
+Minimum Leaf Size..........         1
+Minimum split Size.........         2
+Mean Absolute Error........    0.0000
+Avg Squared Error..........    0.0000
+Accuracy...................    1.0000
+Precision..................    1.0000
+Recall (Sensitivity).......    1.0000
+Specificity................    1.0000
+F1-Score...................    1.0000
+Total Misclassifications...         0
+MISC (Misclassification)...      0.0%
+     class 0                     0.0%
+     class 1                     0.0%
+
+
+     Confusion     Class     Class
+       Matrix          0         1
+  Class 0.....      4000         0
+  Class 1.....         0      4000
+
+Tree grew to depth 33 with 1264 leaves for 8000 cases.
+'Overfitting?'
+
+ ============================================================ 
+ ******* 70/30 Holdout Validation of Kitchen Sink Tree ****** 
+ ============================================================ 
+
+
+
+Model Metrics..........       Training     Validation
+Observations...........           5600           2400
+Features...............             41             41
+Maximum Tree Depth.....           None           None
+Minimum Leaf Size......              1              1
+Minimum split Size.....              2              2
+Mean Absolute Error....         0.0000         0.3183
+Avg Squared Error......         0.0000         0.3183
+Accuracy...............         1.0000         0.6817
+Precision..................     1.0000         0.6750
+Recall (Sensitivity).......     1.0000         0.7008
+Specificity................     1.0000         0.6625
+F1-score...................     1.0000         0.6877
+Total Misclassifications...          0            764
+MISC (Misclassification)...       0.0%          31.8%
+     class 0...............       0.0%          33.8%
+     class 1...............       0.0%          29.9%
+
+
+Training                  Class     Class
+Confusion Matrix              0         1
+Class 0..............      2800         0
+Class 1..............         0      2800
+
+
+Validation                Class     Class
+Confusion Matrix              0         1
+Class 0..............       795       405
+Class 1..............       359       841
+
+               precision    recall  f1-score   support
+
+           0       0.69      0.66      0.68      1200
+           1       0.67      0.70      0.69      1200
+
+    accuracy                           0.68      2400
+   macro avg       0.68      0.68      0.68      2400
+weighted avg       0.68      0.68      0.68      2400
+
+
+ =============================================== 
+ ******** Kitchen Sink 70/30 Validation ******** 
+ =============================================== 
+                       TRAIN  VALIDATION   RATIO
+ ACCURACY............ 1.0000    0.6817    1.4670
+ MISCLASSIFICATION... 0.0000    0.3183       inf
+ ----------------------------------------------- 
+
+Top 10 Feature Importance (from training data):
+
+FEATURE......... IMPORTANCE
+Jun_Status......   0.2477
+Credit_Limit....   0.0515
+May_Payment.....   0.0438
+Age.............   0.0437
+May_Status......   0.0419
+Jun_Bill........   0.0365
+Apr_Payment.....   0.0365
+Apr_PayPercent..   0.0356
+Mar_Bill........   0.0345
+Jan_Payment.....   0.0306
+
+
+
+ ============================================================ 
+ ***** Step 4: Decision Tree Hyperparameter Optimization **** 
+ ============================================================ 
+
+ =============================================== 
+ *************** Hyperparameters *************** 
+ =============================================== 
+ criterion...........['gini', 'entropy']
+ max_depth...........[4, 5, 6, 8, 10, 12, 15, 20, None]
+ min_samples_leaf....[30, 60, 90, 150, 225, 300, 450]
+ min_samples_split...[60, 120, 180, 300, 450, 600, 900]
+
+Smallest class '0': 4000 cases, about 3000 in each training fold
+Leaf sizes are 1% to 15% of 3000
+
+Grid Search: 126 parameter combinations
+Using a 4-fold CV requires 504 total fits
+Parallel processing with n_jobs=-1 for maximum speed
+
+Starting grid search...
+Grid search completed in 0 min. 7 sec.
+Average time per parameter combination  0.06 seconds
+
+ =============================================== 
+ **** Lowest Val MISC (Ignoring Overfitting) *** 
+ =============================================== 
+            criterion...........  entropy
+            max_depth...........        4
+            min_samples_leaf....       30
+            min_samples_split...       60
+                       TRAIN  VALIDATION   RATIO
+ ACCURACY............ 0.7630    0.7581    1.0065
+ MISCLASSIFICATION... 0.2370    0.2419    1.0207
+ ----------------------------------------------- 
+
+ =============================================== 
+ ******** Pass 1: Coarse Leaf Size Scan ******** 
+ =============================================== 
+  LEAF  SPLIT  % SMALLEST CRITERION DEPTH TRAIN MISC  VAL MISC   RATIO
+    30     60        1.0%   entropy     4     0.2370    0.2419  1.0207  <-- selected
+    60    120        2.0%   entropy     5     0.2330    0.2431  1.0435
+    90    180        3.0%   entropy     8     0.2297    0.2443  1.0633
+   150    300        5.0%      gini     6     0.2373    0.2443  1.0291
+   225    450        7.5%   entropy     4     0.2482    0.2528  1.0185
+   300    600       10.0%      gini     4     0.2535    0.2577  1.0169
+   450    900       15.0%      gini     4     0.2614    0.2664  1.0191
+
+ =============================================== 
+ ********* Pass 2: Fine Leaf Size Scan ********* 
+ =============================================== 
+Leaf sizes 15 to 60: 792 new combinations, 3168 fits
+  LEAF  SPLIT  % SMALLEST CRITERION DEPTH TRAIN MISC  VAL MISC   RATIO
+    15     30        0.5%   entropy     4     0.2365    0.2426  1.0261
+    16     32        0.5%   entropy     4     0.2365    0.2426  1.0261
+    17     34        0.6%   entropy     4     0.2365    0.2426  1.0261
+    18     36        0.6%   entropy     4     0.2365    0.2426  1.0261
+    19     38        0.6%   entropy     4     0.2365    0.2428  1.0264
+    20     40        0.7%   entropy     4     0.2365    0.2428  1.0262
+    21     42        0.7%   entropy     4     0.2366    0.2424  1.0243
+    22     44        0.7%   entropy     4     0.2367    0.2425  1.0246
+    23     46        0.8%   entropy     4     0.2367    0.2420  1.0225
+    24     48        0.8%   entropy     4     0.2366    0.2418  1.0217
+    25     50        0.8%   entropy     4     0.2366    0.2418  1.0217
+    26     52        0.9%   entropy     4     0.2368    0.2416  1.0204  <-- selected
+    27     54        0.9%   entropy     4     0.2368    0.2416  1.0204
+    28     56        0.9%   entropy     4     0.2368    0.2416  1.0204
+    29     58        1.0%   entropy     4     0.2370    0.2419  1.0207
+    30     60        1.0%   entropy     4     0.2370    0.2419  1.0207
+    31     62        1.0%   entropy     4     0.2370    0.2430  1.0255
+    32     64        1.1%   entropy     4     0.2370    0.2430  1.0255
+    33     66        1.1%   entropy     4     0.2370    0.2430  1.0255
+    34     68        1.1%   entropy     4     0.2370    0.2430  1.0255
+    35     70        1.2%   entropy     4     0.2370    0.2430  1.0251
+    36     72        1.2%   entropy     4     0.2370    0.2430  1.0251
+    37     74        1.2%   entropy     4     0.2371    0.2430  1.0250
+    38     76        1.3%   entropy     4     0.2374    0.2432  1.0247
+    39     78        1.3%   entropy     4     0.2374    0.2432  1.0247
+    40     80        1.3%   entropy     4     0.2374    0.2432  1.0247
+    41     82        1.4%   entropy     4     0.2374    0.2432  1.0247
+    42     84        1.4%      gini     6     0.2242    0.2432  1.0851
+    43     86        1.4%      gini     6     0.2244    0.2432  1.0839
+    44     88        1.5%   entropy     4     0.2374    0.2432  1.0247
+    45     90        1.5%   entropy     4     0.2374    0.2432  1.0247
+    46     92        1.5%   entropy     4     0.2374    0.2432  1.0247
+    47     94        1.6%   entropy     4     0.2374    0.2432  1.0247
+    48     96        1.6%   entropy     4     0.2374    0.2432  1.0247
+    49     98        1.6%   entropy     4     0.2374    0.2432  1.0247
+    50    100        1.7%   entropy     4     0.2374    0.2432  1.0247
+    51    102        1.7%   entropy     4     0.2374    0.2432  1.0246
+    52    104        1.7%   entropy     6     0.2272    0.2430  1.0695
+    53    106        1.8%   entropy     6     0.2272    0.2430  1.0695
+    54    108        1.8%   entropy     6     0.2272    0.2430  1.0695
+    55    110        1.8%   entropy     6     0.2274    0.2426  1.0669
+    56    112        1.9%   entropy     6     0.2275    0.2426  1.0667
+    57    114        1.9%   entropy     6     0.2275    0.2426  1.0665
+    58    116        1.9%   entropy     6     0.2276    0.2431  1.0681
+    59    118        2.0%   entropy     5     0.2330    0.2433  1.0442
+    60    120        2.0%   entropy     5     0.2330    0.2431  1.0435
+
+ =============================================== 
+ *********** Optimum Hyperparameters *********** 
+ =============================================== 
+            criterion...........  entropy
+            max_depth...........        4
+            min_samples_leaf....       26
+            min_samples_split...       52
+
+ =============================================== 
+ ******* Optimum Tree Performance Metrics ****** 
+ =============================================== 
+                       TRAIN  VALIDATION   RATIO
+ ACCURACY............ 0.7632    0.7584    1.0064
+ MISCLASSIFICATION... 0.2368    0.2416    1.0204
+ ----------------------------------------------- 
+Optimum tree (refit to all 8000 cases) has depth 4 and 16 leaves.
+
+ =============================================== 
+ * Optimum Tree - Top 10 Features by Importance  
+ =============================================== 
+
+
+FEATURE......... IMPORTANCE
+Jun_Status......   0.7921
+Mar_Status......   0.0707
+May_Status......   0.0525
+May_Payment.....   0.0386
+Credit_Limit....   0.0149
+Gender..........   0.0092
+Jan_Status......   0.0076
+Mar_Payment.....   0.0043
+May_Bill........   0.0038
+Feb_Payment.....   0.0033
+
+
+
+ ============================================================ 
+ ********* Step 5: Holdout Validation (70/30 split) ********* 
+ ============================================================ 
+
+
+
+Model Metrics..........       Training     Validation
+Observations...........           5600           2400
+Features...............             41             41
+Maximum Tree Depth.....              4              4
+Minimum Leaf Size......             26             26
+Minimum split Size.....             52             52
+Mean Absolute Error....         0.3314         0.3409
+Avg Squared Error......         0.1657         0.1751
+Accuracy...............         0.7682         0.7512
+Precision..................     0.8529         0.8274
+Recall (Sensitivity).......     0.6482         0.6350
+Specificity................     0.8882         0.8675
+F1-score...................     0.7366         0.7185
+Total Misclassifications...       1298            597
+MISC (Misclassification)...      23.2%          24.9%
+     class 0...............      11.2%          13.2%
+     class 1...............      35.2%          36.5%
+
+
+Training                  Class     Class
+Confusion Matrix              0         1
+Class 0..............      2487       313
+Class 1..............       985      1815
+
+
+Validation                Class     Class
+Confusion Matrix              0         1
+Class 0..............      1041       159
+Class 1..............       438       762
+
+               precision    recall  f1-score   support
+
+           0       0.70      0.87      0.78      1200
+           1       0.83      0.64      0.72      1200
+
+    accuracy                           0.75      2400
+   macro avg       0.77      0.75      0.75      2400
+weighted avg       0.77      0.75      0.75      2400
+
+
+
+ =============================================== 
+ **** Holdout Validation Performance Summary *** 
+ =============================================== 
+                       TRAIN  VALIDATION   RATIO
+ ACCURACY............ 0.7682    0.7512    1.0226
+ MISCLASSIFICATION... 0.2318    0.2488    1.0732
+ ----------------------------------------------- 
+
+                        OPTIMUM TREE            KITCHEN SINK TREE
+ CLASS.......... N VAL   TRAIN     VAL   RATIO     TRAIN     VAL   RATIO
+ 0..............  1200   11.2%   13.2%    1.19      0.0%   33.8%     inf
+ 1..............  1200   35.2%   36.5%    1.04      0.0%   29.9%     inf
+ ALL CLASSES....  2400   23.2%   24.9%    1.07      0.0%   31.8%     inf
+
+
+ ============================================================ 
+ ************** Step 6: K-Fold Cross-Validation ************* 
+ ============================================================ 
+
+
+ ====== 2-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2336 +/-0.0002
+  Test  Avg. MISC..... 0.2438 +/-0.0095
+  Mean Misc Ratio..... 1.0433 +/-0.0418
+  ======================================= 
+Equivalent to 2 splits each with 4000/4000 Cases
+
+
+ ====== 3-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2387 +/-0.0028
+  Test  Avg. MISC..... 0.2443 +/-0.0053
+  Mean Misc Ratio..... 1.0230 +/-0.0245
+  ======================================= 
+Equivalent to 3 splits each with 5333/2667 Cases
+
+
+ ====== 4-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2368 +/-0.0087
+  Test  Avg. MISC..... 0.2416 +/-0.0072
+  Mean Misc Ratio..... 1.0204 +/-0.0659
+  ======================================= 
+Equivalent to 4 splits each with 6000/2000 Cases
+
+
+ ====== 5-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2368 +/-0.0051
+  Test  Avg. MISC..... 0.2463 +/-0.0153
+  Mean Misc Ratio..... 1.0399 +/-0.0631
+  ======================================= 
+Equivalent to 5 splits each with 6400/1600 Cases
+
+
+ ====== 6-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2380 +/-0.0082
+  Test  Avg. MISC..... 0.2470 +/-0.0203
+  Mean Misc Ratio..... 1.0379 +/-0.0650
+  ======================================= 
+Equivalent to 6 splits each with 6667/1333 Cases
+
+
+ ====== 7-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2372 +/-0.0046
+  Test  Avg. MISC..... 0.2476 +/-0.0182
+  Mean Misc Ratio..... 1.0437 +/-0.0827
+  ======================================= 
+Equivalent to 7 splits each with 6857/1143 Cases
+
+
+ ====== 8-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2380 +/-0.0084
+  Test  Avg. MISC..... 0.2482 +/-0.0178
+  Mean Misc Ratio..... 1.0430 +/-0.0716
+  ======================================= 
+Equivalent to 8 splits each with 7000/1000 Cases
+
+
+ ====== 9-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2356 +/-0.0037
+  Test  Avg. MISC..... 0.2439 +/-0.0229
+  Mean Misc Ratio..... 1.0352 +/-0.1011
+  ======================================= 
+Equivalent to 9 splits each with 7111/889 Cases
+
+
+ ====== 10-Fold Cross Validation =======
+  Train Avg. MISC..... 0.2365 +/-0.0044
+  Test  Avg. MISC..... 0.2443 +/-0.0208
+  Mean Misc Ratio..... 1.0328 +/-0.0863
+  ======================================= 
+Equivalent to 10 splits each with 7200/800 Cases
+
+ Best K (lowest Test Avg. MISC) : 4-Fold
+
+ =============================================== 
+ * K-Fold Cross-Validation Performance Summary * 
+ =============================================== 
+                       TRAIN  VALIDATION   RATIO
+ ACCURACY............ 0.7632    0.7584    1.0064
+ MISCLASSIFICATION... 0.2368    0.2416    1.0204
+ ----------------------------------------------- 
+
+ ============================================================ 
+ ********** Step 7: Display and Save Decision Tree ********** 
+ ============================================================ 
+Optimum tree: depth 4, 16 leaves. Displaying up to 3 levels.
+Class order in each node: ['No Default', 'Default']
+Tree saved to CreditDefault_Tree.png, CreditDefault_Tree.pdf, and CreditDefault_Tree (DOT)
+
+ ============================================================ 
+ ****** Credit Default Decision Tree Analysis Complete ****** 
+ ============================================================ 

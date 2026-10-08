@@ -1,0 +1,17 @@
+﻿DATA DICTIONARY
+
+File ai_dev_productivity.csv
+
+ATTRIBUTE	TYPE	EXPECTED VALUES
+hours_coding	Interval	0 - 12
+coffee_intake_mg	Interval	0 - 1000
+distractions	Interval	0 - 10
+sleep_hours	Interval	3 - 12
+commits	Interval	0 - 15
+bugs_reported	Interval	0 -  9
+ai_usage_hours	Interval	0 -  8
+cognitive_load	Interval	0 - 10
+complexity	Nominal	low, mid, high
+experience	Nominal	1, 2, 3 
+task_success	Binary	0 or 1
+
