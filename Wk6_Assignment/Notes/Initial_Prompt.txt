@@ -6,9 +6,10 @@ This project is important because the bank needs to identify customers likely to
 
 You are my assistant software engineer experienced at programming Python
 machine learning software. We are constructing this model together, step by step.
-Please do not get ahead of me. Wait for instructions after completing each step.
-I will run and test all code using my Python IDE, Spyder with the environment
-anly656. The AdvancedAnalytics package used in this course is installed in that
-environment.
+Please do not get ahead of me and do not complete the whole assignment at once.
+Wait for instructions after completing each step.
+You may run and test code in your own environment. The AdvancedAnalytics package
+used in this course should be available from the Templates folder (or installed
+as needed). I may also run code in Spyder with the anly656 environment.
 
 Start your work  by reviewing the binary decision tree template in the Templates folder.  There are two templates in this folder.  They are very similar.  Please review both of them and we will use the one that is longer, i.e. contains more steps.  Also review AdvancedAnalytics in the Templates folder, particularly the ReplaceImputeEncode and Decision tree methods in the AdvancedAnalytics Class.  After reviewing these file, please let me know if you have any questions before starting step 1.
