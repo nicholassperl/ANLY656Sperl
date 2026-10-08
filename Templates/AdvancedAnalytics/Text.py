@@ -183,6 +183,7 @@ class text_analysis(object):
         if display==True:
             df0 = df.groupby('topic').count()
             df0 = df0.rename(columns={'prob':'N'})
+            df0 = df0.reindex(range(n_topics), fill_value=0)
             df0.index = df0.index.astype('int')
             print("\n  ***Topic Counts***\n")
             print("  Topic     N     P")
@@ -196,11 +197,11 @@ class text_analysis(object):
             
             for t in (range(n_topics)):
                 print("    {:<5d}{:>5d}{:>7.1f}%".format(t, \
-                      df0['N'].iloc[t], df0['P'].iloc[t]))
-            if scores==False:
-                return df_topic
-            else:
-                return df 
+                      int(df0['N'].iloc[t]), df0['P'].iloc[t]))
+        if scores==False:
+            return df_topic
+        else:
+            return df 
 
     def display_topics(uv, terms, n_terms=15, \
                        word_cloud=False, mask=None):
@@ -447,7 +448,8 @@ class sentiment_analysis(object):
     def __init__(self, sentiment_dic=None, n_terms=4):
         self.n_terms=n_terms
         self.sentiment_dic = {}
-        if sentiment_dic==None or sentiment_dic.lower()=='afinn':
+        if sentiment_dic is None or (isinstance(sentiment_dic, str) and
+                                     sentiment_dic.lower()=='afinn'):
             # This dictionary is based on the 165 Afinn list
             # Afinn only handles a few no and not sentiments: no good
             # and not fun.  Contractions like can't are not allowed

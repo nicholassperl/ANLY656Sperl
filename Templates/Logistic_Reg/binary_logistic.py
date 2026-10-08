@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Update on Sep 20, 2026
+Update on Sep 26, 2026
 @purpose: Step-by-step optimization and validation of binary logistic reg.
 @data:    CreditDefaultData.csv
 @author:  EJones
 @email:   ejones@tamu.edu
+@version: One standardized encoding (interval_scale="std", no dropped
+          one-hot columns) is used by every model and both validation
+          steps. Adds a correlated-attribute check (Step 1) and a final
+          model interpretation (Step 10).
 """
 # ANSI color codes - to print in color, the package colorama must be installed
 RED   = "\033[38;5;197m"  
@@ -19,9 +23,11 @@ import pandas as pd
 import numpy  as np
 import statsmodels.api   as sm
 import matplotlib.pyplot as plt
-from sklearn.linear_model    import LogisticRegression, LogisticRegressionCV
-from sklearn.metrics         import accuracy_score, confusion_matrix
-from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.linear_model    import LogisticRegression
+from sklearn.metrics         import (accuracy_score, confusion_matrix,
+                                     ConfusionMatrixDisplay)
+from sklearn.model_selection import (train_test_split, cross_validate,
+                                     StratifiedKFold)
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
 from AdvancedAnalytics.Regression          import logreg, stepwise
 
@@ -120,6 +126,38 @@ def lr_plot(lr, X, y, bestc):
     plt.savefig(pltFile, pad_inches=0.1, dpi=256, bbox_inches='tight')
     plt.show()
 
+def confusion_heatmap(model, X, y, title, ax=None):
+    """Display normalized confusion matrix as a heat map."""
+    gold = '#D4AF37'
+    fs   = 12
+    own_fig = ax is None
+    if own_fig:
+        plt.style.use('dark_background')
+        fig, ax = plt.subplots(figsize=(5, 4))
+    ConfusionMatrixDisplay.from_estimator(model, X, y, normalize='true',
+                                          cmap='Blues', ax=ax,
+                                          colorbar=False)
+    ax.set_title(title, color=gold, fontsize=fs, fontweight='bold')
+    if own_fig:
+        plt.tight_layout()
+        plt.show()
+
+def confusion_heatmap_pair(model, Xt, yt, Xv, yv, title_prefix, plt_file=None):
+    """Side-by-side training and validation confusion matrix heat maps."""
+    gold = '#D4AF37'
+    fs   = 12
+    plt.style.use('dark_background')
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    confusion_heatmap(model, Xt, yt, f"{title_prefix} - Training", ax=axes[0])
+    confusion_heatmap(model, Xv, yv, f"{title_prefix} - Validation", ax=axes[1])
+    fig.suptitle("Confusion Matrix Heat Maps (Normalized by True Class)",
+                 color=gold, fontsize=fs + 1, fontweight='bold')
+    plt.tight_layout()
+    if plt_file is None:
+        plt_file = 'confusion_heatmap.png'
+    plt.savefig(plt_file, pad_inches=0.1, dpi=256, bbox_inches='tight')
+    plt.show()
+
 lbl = "Step 1: Reading Data and Preparing Data Map"
 print_boundary(lbl)
 
@@ -177,19 +215,41 @@ for col, (dt_type, valid_values) in data_map.items():
 print(f"{GOLD} === Data Map has{RED}", len(data_map)-ignored,
       f"{GOLD}attribute columns", 3*"=",f"{RESET}")
 
+# Report highly correlated interval attributes. All are kept; stepwise and
+# L1 decide which to use, but coefficients within a correlated set are
+# unstable and should not be over-interpreted.
+r_min    = 0.90
+interval = [col for col, (dt_type, _) in data_map.items()
+            if dt_type.name == "Interval"]
+r        = df[interval].corr()
+pairs    = [(interval[i], interval[j], r.iloc[i, j])
+            for i in range(len(interval)) for j in range(i+1, len(interval))
+            if abs(r.iloc[i, j]) >= r_min]
+print(f"{GOLD}Interval attribute pairs with |r| >= {r_min:.2f}:{RESET}")
+if not pairs:
+    print(f"  {TEAL}None{RESET}")
+for a, b, v in sorted(pairs, key=lambda p: -abs(p[2])):
+    print(f"  {TEAL}{a:.<16s} {b:.<16s} {GREEN}r = {v: .3f}{RESET}")
+
 lbl = "Step 2: ReplaceImputeEncode (RIE) Processing"
 print_boundary(lbl)
 
 # Set target variable
 target = "Default"
 print(f"{GOLD}")
-# Apply ReplaceImputeEncode preprocessing
+# One encoding is used by every model.
+#   interval_scale="std" - L1 and L2 need a common scale, since the penalty
+#       treats attributes alike only when they share one. For ALL and
+#       Stepwise it changes only the coefficient units (per standard
+#       deviation), not the selection, p-values or predictions.
+#   drop=False (default) - every one-hot column is kept. The ALL model then
+#       has redundant columns, which GLM handles; stepwise and L1 choose
+#       among the nominal levels.
 rie = ReplaceImputeEncode(data_map=data_map,
-                          interval_scale=None,  # No standardization of interval features
+                          interval_scale="std",
                           no_impute=[target],    # Do not impute target variable
                           binary_encoding="one-hot",
                           nominal_encoding="one-hot",
-                          drop=False,             # Drop one column from each encoded nominal set
                           display=True)
 
 # Transform the data
@@ -199,35 +259,41 @@ print(f"{RED}encoded_df{GOLD} created from {TEAL}{data_file}{GOLD} containing",
       f"{TEAL}{encoded_df.shape[0]} {GOLD}cases & {TEAL}{encoded_df.shape[1]}",
       f" {GOLD}columns, including the target {RED}'{target}'{RESET}")
 
-# Create version without dropped columns for analysis using ALL attributes
-rie = ReplaceImputeEncode(data_map=data_map,
-                                  interval_scale=None,
-                                  no_impute=[target],
-                                  binary_encoding="one-hot",
-                                  nominal_encoding="one-hot",
-                                  drop=True,  # Keep all columns for stepwise
-                                  display=False)
-encoded_drp_df = rie.fit_transform(df)
-print(f"{RESET}")
-print(f"{RED}encoded_drp_df{GOLD} created from {TEAL}{data_file}{GOLD}", 
-      f"containing {TEAL}{encoded_drp_df.shape[0]} {GOLD}cases &", 
-      f"{TEAL}{encoded_drp_df.shape[1]}{GOLD} columns, including the", 
-      f"target {RED}'{target}'{RESET}")
+# Binary target (0/1). The same y is used by every model.
+y = encoded_df[target]
+n = encoded_df.shape[0]
 
 #***************************************************************************
 #**************** All Features Logistic Regression *************************
 lbl = " STEP 3: Logistic Regression using All Attributes"
 print_boundary(lbl)
 print(f"\n{GOLD}Predicting {RED}'{target}'{GOLD} using", 
-      f"{RED}'All'{GOLD} Attributes in {RED}encoded_drp_df{RESET}")
+      f"{RED}'All'{GOLD} Attributes in {RED}encoded_df{RESET}")
 
-y = encoded_drp_df[target]
-X = encoded_drp_df.drop(target, axis=1)
+X = encoded_df.drop(target, axis=1)
 Xc = sm.add_constant(X)
 
+# Use GLM, not Logit. GLM fits even when columns are redundant (such as a
+# complete set of one-hot columns plus the intercept). Its predictions and
+# accuracy are valid, but individual coefficients should not be interpreted.
 glm_model = sm.GLM(y, Xc, family=sm.families.Binomial()).fit()
 print(f"{GOLD}")
 print(glm_model.summary())
+
+# All one-hot columns are kept, so each nominal set adds up to the
+# intercept column. Their split is arbitrary; only differences are valid.
+nominal = [col for col, (dt_type, _) in data_map.items()
+           if dt_type.name == "Nominal"]
+if nominal:
+    print(f"{RED}NOTE: Do not interpret the 'const' or nominal-level",
+          f"coefficients and p-values above")
+    print(f"      ({', '.join(nominal)}). With every level kept, the split",
+          f"between")
+    print(f"      the intercept and the levels is arbitrary. Only the",
+          f"difference")
+    print(f"      between two levels of the same attribute is meaningful.")
+    print(f"      Interval and binary coefficients and p-values are valid.",
+          f"{RESET}")
 
 # Display the confusion Matrix
 pred_prob = glm_model.predict(Xc)  # Predicted prob(target=1) target=0 or 1
@@ -236,7 +302,6 @@ accuracy_all = accuracy_score(y, pred_class)
 conf_mat = confusion_matrix(y, pred_class)
 misc_all = conf_mat[0, 1] + conf_mat[1, 0]
 logreg.display_confusion(conf_mat)
-n = df.shape[0]
 misc_p = misc_all/n
 print(f"{RESET}")
 print(f"{TEAL}Logistic Regression using {GREEN}'ALL' {TEAL}attributes ****")
@@ -258,8 +323,7 @@ print(f" {GOLD}Stepwise selected {RED}{len(selected)}{GOLD} out of",
       f"{RED}{encoded_df.shape[1]-1} {GOLD}features.{RESET}")
 print(F"{TEAL}", "="*80, f"{RESET}")
 
-# Extract target and predictors from encoded_df
-y = encoded_df[target]
+# Predictors selected by stepwise
 X = encoded_df[selected]
 print(f"{RESET}")
 print(f"\n{RED}Stepwise{GOLD} Logistic Regression {RESET}")
@@ -278,7 +342,6 @@ logreg.display_confusion(conf_mat)
 
 print(f"{RESET}")
 misc_step = conf_mat[1, 0] + conf_mat[0, 1]
-n = df.shape[0]
 misc_p = misc_step/n
 n_selected = len(selected)
 print(f"{RED}Stepwise Logistic Regression {TEAL}selected",
@@ -293,7 +356,6 @@ feature_step = list(selected)
 lbl = "STEP 5: L1 REGULARIZATION SELECTION"
 print_boundary(lbl)
 
-y = encoded_df[target]  
 X = encoded_df.drop(target, axis=1)  # Features without target
 nf = X.shape[1]
 
@@ -339,7 +401,6 @@ n_selected  = len(selected)
 pred_class  = lgr_l1.predict(Xs)
 conf_mat    = confusion_matrix(y, pred_class)
 misc_l1     = conf_mat[1, 0] + conf_mat[0, 1]
-n           = df.shape[0]
 misc_p      = misc_l1/n
 print(f"{RED}L1 Logistic Regression {TEAL}using {GREEN}c={best_l1_c}",
       f"{TEAL}selected {GREEN}{n_selected}{TEAL} attributes")
@@ -354,7 +415,6 @@ lr_plot(lgr_l1, Xs, y, best_l1_c)
 lbl = "STEP 6: L2 REGULARIZATION"
 print_boundary(lbl)
 
-y = encoded_df[target]  # Original target
 X = encoded_df.drop(target, axis=1)
 
 # Test different regularization strengths
@@ -398,7 +458,6 @@ accuracy_l2 = lgr_l2.score(Xs, y)
 pred_class  = lgr_l2.predict(Xs)
 conf_mat    = confusion_matrix(y, pred_class)
 misc_l2     = conf_mat[1, 0] + conf_mat[0, 1]
-n           = df.shape[0]
 misc_p      = misc_l2/n
 n_selected  = len(feature_l2)
 print(f"{RED}L2 Logistic Regression {TEAL}using {GREEN}c={best_l2_c}",
@@ -415,7 +474,6 @@ print_boundary(lbl)
 print("")
 print(f"{TEAL}", 44*"="+f"{RESET}")
 models   = ["ALL", "Stepwise", "L1 Reg.", "L2 Reg."]
-fitted   = [lgr, glm_model, lgr_l1, lgr_l2]
 m_acc    = [accuracy_all, accuracy_step, accuracy_l1, accuracy_l2]
 misc     = [misc_all, misc_step, misc_l1, misc_l2]
 features = [feature_all, feature_step, feature_l1, feature_l2]
@@ -427,7 +485,6 @@ for i in range(1,4):
         best_i     = i
         
 print(f"{GOLD} MODEL               ACCURACY          MISC{RESET}")
-n = len(y)
 for i in range(4):
     if i == best_i:
         print(f"{RED} {models[i]:.<19s}{RESET} {GREEN}{m_acc[i]: 7.2%} ",
@@ -483,27 +540,40 @@ print_boundary(lbl)
 
 best_features = features[best_i]
 best_model    = models[best_i]
-y = df[target]  # Use original target values (not encoded)
-X = encoded_df[best_features]  # Use features from best model
-X_train, X_val, y_train, y_val = train_test_split(X, y,
-                                    test_size=0.3, random_state=12345)
-if best_model == "Stepwise":
-    lgr = LogisticRegression(None, tol=1e-8, max_iter=10000,
-                         solver="newton-cg", random_state=31415)
-elif best_model == "L1 Reg.":
-    lgr = LogisticRegression('l1', C=c, tol=1e-4, max_iter=500, l1_ratio=1,
-                             solver="liblinear", random_state=31415).fit(X, y)
-elif best_model == "L2 Reg.":
-    lgr = LogisticRegression("l2", C=best_l2_c, tol=1e-8, max_iter=10000,
-                             solver="newton-cg", random_state=31415)
-lgr = lgr.fit(X_train, y_train)
+print(f"{GOLD}Best model: {RED}{best_model}{GOLD} with",
+      f"{RED}{len(best_features)}{GOLD} features{RESET}")
+
+
+def best_lgr():
+    # Same settings used to fit the best model in Steps 3-6, so hold-out
+    # and k-fold validate that model and not a variant of it
+    if best_model == "L1 Reg.":
+        return LogisticRegression('l1', C=best_l1_c, tol=1e-8,
+                                  max_iter=10000, l1_ratio=1,
+                                  solver="liblinear", random_state=31415)
+    if best_model == "L2 Reg.":
+        return LogisticRegression("l2", C=best_l2_c, tol=1e-8,
+                                  max_iter=10000, l1_ratio=0,
+                                  solver="newton-cg", random_state=31415)
+    # ALL and Stepwise are unpenalized
+    return LogisticRegression(None, tol=1e-8, max_iter=10000,
+                              solver="newton-cg", random_state=31415)
+
+
+X_best = encoded_df[best_features]  # Use features from best model
+X_train, X_val, y_train, y_val = train_test_split(X_best, y,
+                                    test_size=0.3, random_state=12345,
+                                    stratify=y)
+lgr = best_lgr().fit(X_train, y_train)
 print(f"{GOLD}")
 logreg.display_split_metrics(lgr, X_train, y_train, X_val, y_val)
 print(f"{RESET}")
+confusion_heatmap_pair(lgr, X_train, y_train, X_val, y_val,
+                       f"Best Model: {best_model}")
 # Examine Possible Overfitting
 misc_train     = 1.0 - lgr.score(X_train, y_train)
 misc_val       = 1.0 - lgr.score(X_val,   y_val)
-if misc_val > 0:
+if misc_train > 0:
     overfit_ratio = misc_val/misc_train
 else:
     overfit_ratio = np.inf
@@ -520,22 +590,52 @@ else:
 lbl = "STEP 9: K-FOLD CROSS VALIDATION"
 print_boundary(lbl)
 
-n  = X.shape[0]
-if best_model == "Stepwise":
-    lgr = LogisticRegression(None, tol=1e-8, max_iter=10000,
-                         solver="newton-cg", random_state=31415)
-elif best_model == "L1 Reg.":
-    lgr = LogisticRegression('l1', C=c, tol=1e-4, max_iter=10000, l1_ratio=1,
-                             solver="liblinear", random_state=31415).fit(X, y)
-elif best_model == "L2 Reg.":
-    lgr = LogisticRegression("l2", C=best_l2_c, tol=1e-8, max_iter=10000,
-                             solver="newton-cg", random_state=31415)
-    
+lgr = best_lgr()
 for n_folds in range(2, 11):
-    scores  = cross_validate(lgr, X, y,
+    cv = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=12345)
+    scores  = cross_validate(lgr, X_best, y,
                              scoring="accuracy",
-                             cv=n_folds, return_train_score=True, )
+                             cv=cv, return_train_score=True)
     print_acc_ratio(scores, n)
+
+#****************************** INTERPRETATION *****************************
+lbl = "STEP 10: FINAL MODEL INTERPRETATION"
+print_boundary(lbl)
+
+# Refit the chosen model (with its own penalty, if any) on all cases.
+# Interval coefficients are per standard deviation; dividing by the
+# attribute's std (ddof=0, as used by RIE, after imputation) converts them
+# to original units. One-hot and binary columns are 0/1 and not scaled.
+final     = best_lgr().fit(X_best, y)
+coefs_std = pd.Series(final.coef_[0], index=best_features)
+order     = coefs_std.abs().sort_values(ascending=False).index
+
+print(f"{GOLD}Final model: {RED}{best_model}{GOLD} logistic regression with",
+      f"{RED}{len(best_features)}{GOLD} features (event = {target} = 1).")
+print(f"{GOLD}Hold-out validation misclassification: {GREEN}{misc_val:.1%}",
+      f"{GOLD}(overfit ratio {GREEN}{overfit_ratio:.2f}{GOLD}).")
+cv_misc  = (1.0 - scores["test_score"]).mean()
+cv_ratio = ((1.0 - scores["test_score"]) / (1.0 - scores["train_score"])).mean()
+print(f"{GOLD}{n_folds}-fold CV misclassification: {GREEN}{cv_misc:.1%}",
+      f"{GOLD}(mean overfit ratio {GREEN}{cv_ratio:.2f}{GOLD}).")
+print(f"{GOLD}A single 70/30 split is noisy; the {n_folds}-fold ratio is the",
+      f"more reliable overfitting check.{RESET}")
+
+print(f"\n{GOLD} Top 5 attributes by |coefficient|{RESET}")
+print(f"{GOLD} ATTRIBUTE.............  COEF  ODDS RATIO  PER{RESET}")
+for col in order[:5]:
+    b = coefs_std[col]
+    if col in interval:
+        per = f"1 std. dev. ({rie.imputed_data_df[col].std(ddof=0):,.4g})"
+    else:
+        per = "0 to 1"
+    print(f" {TEAL}{col:.<20s}{GREEN}{b: 7.3f}  {np.exp(b):9.3f}  {GOLD}{per}{RESET}")
+
+val_pred = best_lgr().fit(X_train, y_train).predict(X_val)
+cm = confusion_matrix(y_val, val_pred)
+print(f"\n{GOLD}Hold-out error by class: {target}=0 {GREEN}"
+      f"{cm[0, 1] / cm[0].sum():.1%}{GOLD}, {target}=1 {GREEN}"
+      f"{cm[1, 0] / cm[1].sum():.1%}{RESET}")
 
 lbl = "Analysis of Binary Logistic Reg. Data Complete"
 print_boundary(lbl)

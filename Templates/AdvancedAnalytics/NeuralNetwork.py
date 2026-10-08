@@ -17,6 +17,14 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.metrics import f1_score, confusion_matrix, classification_report 
 from sklearn.neural_network import MLPClassifier
 
+def _indicator(y, classes):
+    # Nominal metrics below index targets by column; convert 1-D labels
+    # to a one-hot array whose columns follow classes
+    if isinstance(y, pd.DataFrame) or np.ndim(y) > 1:
+        return y
+    y = np.ravel(y)
+    return (y[:, None] == np.asarray(classes)[None, :]).astype(int)
+
 class nn_regressor(object):
             
     def display_metrics(nn, X, y):
@@ -34,13 +42,8 @@ class nn_regressor(object):
                               nn.n_layers_-2))
         print("{:.<23s}{:15d}".format('Outputs', \
                               nn.n_outputs_))
-        n_neurons = 0
         nl = nn.n_layers_-2
-        if nl>1:
-            for i in range(nl):
-                n_neurons += nn.hidden_layer_sizes[i]
-        else:
-            n_neurons = nn.hidden_layer_sizes
+        n_neurons = sum(nn.coefs_[i].shape[1] for i in range(nl))
         print("{:.<23s}{:15d}".format('Neurons',\
                               n_neurons))
         print("{:.<23s}{:15d}".format('Weights', \
@@ -78,13 +81,8 @@ class nn_regressor(object):
                                           Xt.shape[1], Xv.shape[1]))
         print("{:.<23s}{:15d}{:15d}".format('Hidden Layers',\
                               (nn.n_layers_-2),(nn.n_layers_-2)))
-        n_neurons = 0
         nl = nn.n_layers_-2
-        if nl>1:
-            for i in range(nl):
-                n_neurons += nn.hidden_layer_sizes[i]
-        else:
-            n_neurons = nn.hidden_layer_sizes
+        n_neurons = sum(nn.coefs_[i].shape[1] for i in range(nl))
         print("{:.<23s}{:15d}{:15d}".format('Neurons',\
                               n_neurons, n_neurons))
         print("{:.<23s}{:15d}{:15d}".format('Outputs', \
@@ -116,17 +114,18 @@ class nn_classifier(object):
     def display_metrics(nn, X, y):
         if len(nn.classes_) <= 2: #BINARY METRICS
             numpy_y = np.ravel(y)
-            if type(numpy_y[0])==str:
+            if isinstance(numpy_y[0], str):
                 classes_ = nn.classes_
             else:
                 classes_ = [str(int(nn.classes_[0])), str(int(nn.classes_[1]))]
             z = np.zeros(len(y))
             predictions = nn.predict(X) # get binary class predictions
-            conf_mat = confusion_matrix(y_true=y, y_pred=predictions)
+            conf_mat = confusion_matrix(y_true=y, y_pred=predictions,
+                                        labels=nn.classes_)
             tmisc = conf_mat[0][1]+conf_mat[1][0]
             misc = 100*(tmisc)/(len(y))
             for i in range(len(y)):
-                if numpy_y[i] == 1:
+                if numpy_y[i] == nn.classes_[1]:
                     z[i] = 1
             probability = nn.predict_proba(X) # get binary probabilities
             #Calculate number of weights
@@ -142,13 +141,8 @@ class nn_classifier(object):
                                   nn.n_layers_-2))
             print("{:.<27s}{:10d}".format('Outputs', \
                                   nn.n_outputs_))
-            n_neurons = 0
             nl = nn.n_layers_-2
-            if nl>1:
-                for i in range(nl):
-                    n_neurons += nn.hidden_layer_sizes[i]
-            else:
-                n_neurons = nn.hidden_layer_sizes
+            n_neurons = sum(nn.coefs_[i].shape[1] for i in range(nl))
             print("{:.<27s}{:10d}".format('Neurons',\
                                   n_neurons))
             print("{:.<27s}{:10d}".format('Weights', \
@@ -167,20 +161,9 @@ class nn_classifier(object):
                           mean_squared_error(z,probability[:, 1])))
             acc = accuracy_score(y, predictions)
             print("{:.<27s}{:10.4f}".format('Accuracy', acc))
-            if type(numpy_y[0]) == str:
-                pre = precision_score(y, predictions, pos_label=classes_[1])
-                tpr = recall_score(y, predictions, pos_label=classes_[1])
-                f1  =  f1_score(y,predictions, pos_label=classes_[1])
-                pre = precision_score(y, predictions, pos_label=classes_[1])
-                tpr = recall_score(y, predictions, pos_label=classes_[1])
-                f1 =  f1_score(y,predictions, pos_label=classes_[1])
-            else:
-                pre = precision_score(y, predictions)
-                tpr = recall_score(y, predictions)
-                f1  =  f1_score(y,predictions)
-                pre = precision_score(y, predictions)
-                tpr = recall_score(y, predictions)
-                f1 =  f1_score(y,predictions)
+            pre = precision_score(y, predictions, pos_label=nn.classes_[1])
+            tpr = recall_score(y, predictions, pos_label=nn.classes_[1])
+            f1  = f1_score(y, predictions, pos_label=nn.classes_[1])
             print("{:.<27s}{:10.4f}".format('Precision', pre))
             print("{:.<27s}{:10.4f}".format('Recall (Sensitivity)', tpr))
             print("{:.<27s}{:10.4f}".format('F1-Score', f1))
@@ -210,7 +193,8 @@ class nn_classifier(object):
                 raise RuntimeError("\n  Call to display_metrics invalid"+\
                         "\n  Target does not appear to be nominal.\n")
                 sys.exit()
-            predict_ = nn.predict(X)
+            y        = _indicator(y, nn.classes_)
+            predict_ = _indicator(nn.predict(X), nn.classes_)
             prob_ = nn.predict_proba(X)
             ase_sum  = 0
             mase_sum = 0
@@ -229,7 +213,7 @@ class nn_classifier(object):
                 else:
                    ky = y[i].argmax()
                 for j in range(n_classes):
-                    if ky == nn.classes_[j]:
+                    if ky == j:
                         ase_sum += (1-prob_[i,j])*(1-prob_[i,j])
                         mase_sum += 1-prob_[i,j]
                         idx = j
@@ -239,11 +223,8 @@ class nn_classifier(object):
                         mase_sum += prob_[i,j]
                 
                 kp = predict_[i].argmax()
-                for j in range(n_classes):
-                    if kp == nn.classes_[j]:
-                            conf_mat[idx][j] += 1
-                            continue
-                if kp != nn.classes_[idx]:
+                conf_mat[idx][kp] += 1
+                if kp != idx:
                     misc_     += 1
                     misc[idx] += 1
             tmisc = misc_
@@ -277,7 +258,6 @@ class nn_classifier(object):
             print("{:.<27s}{:10.4f}".format('Avg Squared Error', ase))
             print("{:.<27s}{:10.4f}".format('Root ASE', sqrt(ase)))
             print("{:.<27s}{:10.4f}".format('Mean Absolute Error', mase))
-            print(y.shape, predict_.shape)
             acc = accuracy_score(y, predict_)
             print("{:.<27s}{:10.4f}".format('Accuracy', acc))
             pre = precision_score(y, predict_, average='macro')
@@ -292,7 +272,7 @@ class nn_classifier(object):
                     'Total Misclassifications', tmisc))
             print("{:.<27s}{:9.1f}{:s}".format(\
                     'MISC (Misclassification)', misc_, '%'))
-            if type(nn.classes_[0]) == str:
+            if isinstance(nn.classes_[0], str):
                 fstr = "{:s}{:.<16s}{:>9.1f}{:<1s}"
             else:
                 fstr = "{:s}{:.<16.0f}{:>9.1f}{:<1s}"
@@ -304,7 +284,7 @@ class nn_classifier(object):
             print("\n\n     Confusion")
             print("       Matrix    ", end="")
             
-            if type(nn.classes_[0]) == str:
+            if isinstance(nn.classes_[0], str):
                 fstr1 = "{:>7s}{:<3s}"
                 fstr2 = "{:s}{:.<6s}"
             else:
@@ -319,7 +299,8 @@ class nn_classifier(object):
                     print("{:>10.0f}".format(conf_mat[i][j]), end="")
                 print("")
     
-            cr = classification_report(y, predict_, labels=nn.classes_)
+            cr = classification_report(y, predict_, labels=range(n_classes),
+                               target_names=[str(c) for c in nn.classes_])
             print("\n",cr)
         
     def display_split_metrics(nn, Xt, yt, Xv, yv, target_names=None):
@@ -333,7 +314,7 @@ class nn_classifier(object):
                 raise RuntimeError("  Call to display_split_metrics "+\
                       "invalid.\n  Target does not have two classes.\n")
                 sys.exit()
-            if type(nn.classes_[0])==np.str_:
+            if isinstance(nn.classes_[0], str):
                 classes_ = nn.classes_
             else:
                 classes_ = [str(int(nn.classes_[0])), str(int(nn.classes_[1]))]
@@ -349,15 +330,17 @@ class nn_classifier(object):
             zv = np.zeros(len(yv))
             #zt = deepcopy(yt)
             for i in range(len(yt)):
-                if numpy_yt[i] == 1:
+                if numpy_yt[i] == nn.classes_[1]:
                     zt[i] = 1
             for i in range(len(yv)):
-                if numpy_yv[i] == 1:
+                if numpy_yv[i] == nn.classes_[1]:
                     zv[i] = 1
             predict_t = nn.predict(Xt)
             predict_v = nn.predict(Xv)
-            conf_matt = confusion_matrix(y_true=yt, y_pred=predict_t)
-            conf_matv = confusion_matrix(y_true=yv, y_pred=predict_v)
+            conf_matt = confusion_matrix(y_true=yt, y_pred=predict_t,
+                                         labels=nn.classes_)
+            conf_matv = confusion_matrix(y_true=yv, y_pred=predict_v,
+                                         labels=nn.classes_)
             prob_t = nn.predict_proba(Xt)
             prob_v = nn.predict_proba(Xv)
             print("\n")
@@ -373,13 +356,8 @@ class nn_classifier(object):
                                       nn.n_layers_-2, nn.n_layers_-2))
                 print("{:.<27s}{:11d}{:15d}".format('Outputs', \
                                       nn.n_outputs_, nn.n_outputs_))
-                n_neurons = 0
                 nl = nn.n_layers_-2
-                if nl>1:
-                    for i in range(nl):
-                        n_neurons += nn.hidden_layer_sizes[i]
-                else:
-                    n_neurons = nn.hidden_layer_sizes
+                n_neurons = sum(nn.coefs_[i].shape[1] for i in range(nl))
                 print("{:.<27s}{:11d}{:15d}".format('Neurons',
                                       n_neurons, n_neurons))
                 print("{:.<27s}{:11d}{:15d}".format('Weights', 
@@ -400,20 +378,13 @@ class nn_classifier(object):
             acct = accuracy_score(yt, predict_t)
             accv = accuracy_score(yv, predict_v)
             print("{:.<27s}{:11.4f}{:15.4f}".format('Accuracy', acct, accv))
-            if type(numpy_yt[0])==str:
-                pre_t = precision_score(yt, predict_t, pos_label=classes_[1])
-                tpr_t = recall_score(yt, predict_t, pos_label=classes_[1])
-                f1_t  = f1_score(yt,predict_t, pos_label=classes_[1])
-                pre_v = precision_score(yv, predict_v, pos_label=classes_[1])
-                tpr_v = recall_score(yv, predict_v, pos_label=classes_[1])
-                f1_v  = f1_score(yv,predict_v, pos_label=classes_[1])
-            else:
-                pre_t = precision_score(yt, predict_t)
-                tpr_t = recall_score(yt, predict_t)
-                f1_t  = f1_score(yt,predict_t)
-                pre_v = precision_score(yv, predict_v)
-                tpr_v = recall_score(yv, predict_v)
-                f1_v  = f1_score(yv,predict_v)
+            pos = nn.classes_[1]
+            pre_t = precision_score(yt, predict_t, pos_label=pos)
+            tpr_t = recall_score(yt, predict_t, pos_label=pos)
+            f1_t  = f1_score(yt,predict_t, pos_label=pos)
+            pre_v = precision_score(yv, predict_v, pos_label=pos)
+            tpr_v = recall_score(yv, predict_v, pos_label=pos)
+            f1_v  = f1_score(yv,predict_v, pos_label=pos)
                 
             print("{:.<27s}{:11.4f}{:15.4f}".format('Precision', pre_t, pre_v))
             print("{:.<27s}{:11.4f}{:15.4f}".format('Recall (Sensitivity)', 
@@ -485,8 +456,10 @@ class nn_classifier(object):
                       "invalid.\n  Target has less than three classes.\n")
                 sys.exit()
 
-            predict_t = nn.predict(Xt)
-            predict_v = nn.predict(Xv)
+            yt        = _indicator(yt, nn.classes_)
+            yv        = _indicator(yv, nn.classes_)
+            predict_t = _indicator(nn.predict(Xt), nn.classes_)
+            predict_v = _indicator(nn.predict(Xv), nn.classes_)
             
             if type(yt) == pd.DataFrame or len(yt.shape) > 1:
                 # Nominal Target
@@ -623,7 +596,7 @@ class nn_classifier(object):
             for i in range(nt_obs):
                 for j in range(n_classes):
                     if type(y_t) == pd.DataFrame:
-                       if y_t.iloc[i].argmax() == nn.classes_[j]:
+                       if y_t.iloc[i].argmax() == j:
                            ase_sumt += (1-prob_t[i,j])*(1-prob_t[i,j])
                            mase_sumt += (1-prob_t[i,j])
                            idx = j
@@ -631,7 +604,7 @@ class nn_classifier(object):
                            ase_sumt += prob_t[i,j]*prob_t[i,j]
                            mase_sumt += prob_t[i,j]
                     else:
-                       if y_t[i].argmax() == nn.classes_[j]:
+                       if y_t[i].argmax() == j:
                            ase_sumt += (1-prob_t[i,j])*(1-prob_t[i,j])
                            mase_sumt += (1-prob_t[i,j])
                            idx = j
@@ -652,7 +625,7 @@ class nn_classifier(object):
             for i in range(nv_obs):
                 if type(y_v) == pd.DataFrame:
                    for j in range(n_classes):
-                       if y_v.iloc[i].argmax() == nn.classes_[j]:
+                       if y_v.iloc[i].argmax() == j:
                            ase_sumv += (1-prob_v[i,j])*(1-prob_v[i,j])
                            mase_sumv += (1-prob_v[i,j])
                            idx = j
@@ -661,7 +634,7 @@ class nn_classifier(object):
                            mase_sumv += prob_v[i,j]
                 else:
                    for j in range(n_classes):
-                       if y_v[i].argmax() == nn.classes_[j]:
+                       if y_v[i].argmax() == j:
                               ase_sumv += (1-prob_v[i,j])*(1-prob_v[i,j])
                               mase_sumv += (1-prob_v[i,j])
                               idx = j
@@ -686,7 +659,7 @@ class nn_classifier(object):
             aset   = ase_sumt/(n_classes*nt_obs)
             asev   = ase_sumv/(n_classes*nv_obs)
             maset  = mase_sumt/(n_classes*nt_obs)
-            masev  = mase_sumv/(n_classes*nt_obs)
+            masev  = mase_sumv/(n_classes*nv_obs)
                     #Calculate number of weights
             n_weights = 0
             for i in range(nn.n_layers_ - 1):
@@ -748,11 +721,13 @@ class nn_classifier(object):
             fstr1="{:>7s}{:<3s}"
             fstr2="{:s}{:.<6s}"
             classes_ = []
-            if type(nn.classes_[0])==str:
+            if isinstance(nn.classes_[0], str):
                 classes_ = nn.classes_
             else:
                 for i in range(n_classes):
                     classes_.append(str(int(nn.classes_[i])))
+            if target_names is None:
+                target_names = [str(c) for c in classes_]
             for i in range(n_classes):
                if n_t[i] > 0:
                   misct[i] = 100*misct[i]/n_t[i]
@@ -776,7 +751,8 @@ class nn_classifier(object):
                     print("{:>10d}".format(conf_mat_t[i][j]), end="")
                 print("")
                 
-            ct = classification_report(yt, predict_t, labels=target_names)
+            ct = classification_report(yt, predict_t, labels=range(n_classes),
+                                       target_names=target_names)
             print("\nTraining \nMetrics:\n",ct)
             
             print("\n\nValidation")
@@ -789,7 +765,8 @@ class nn_classifier(object):
                 for j in range(n_classes):
                     print("{:>10d}".format(conf_mat_v[i][j]), end="")
                 print("")
-            cv = classification_report(yv, predict_v, labels=target_names)
+            cv = classification_report(yv, predict_v, labels=range(n_classes),
+                                       target_names=target_names)
             print("\nValidation \nMetrics:\n",cv)
             
 class nn_keras(object):
