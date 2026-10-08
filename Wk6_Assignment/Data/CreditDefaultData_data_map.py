@@ -1,13 +1,12 @@
-
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
 
 data_map = {
-    'Customer':        [DT.Ignore,   (0.99, 29998.01)],
-    'Default':         [DT.Binary,   (0, 1)],
-    'card_class':      [DT.Nominal,  (1, 2, 3)],
-    'Gender':          [DT.Binary,   (1.0, 2.0)],
-    'Education':       [DT.Nominal,  (0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0)],
-    'Marital_Status':  [DT.Nominal,  (0, 1, 2, 3)],
+    'Customer':        [DT.Interval, (0.99, 29998.01)],
+    'Default':         [DT.Binary, (0, 1)],
+    'card_class':      [DT.Nominal, (1, 2, 3)],
+    'Gender':          [DT.Binary, (1.0, 2.0)],
+    'Education':       [DT.Nominal, (0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0)],
+    'Marital_Status':  [DT.Nominal, (0, 1, 2, 3)],
     'Age':             [DT.Interval, (20.99, 75.01)],
     'Credit_Limit':    [DT.Interval, (299.99, 27400.01)],
     'Jun_Status':      [DT.Interval, (-2.01, 8.01)],
@@ -35,4 +34,3 @@ data_map = {
     'Feb_PayPercent':  [DT.Interval, (-0.01, 1.01)],
     'Jan_PayPercent':  [DT.Interval, (-0.01, 1.01)],
 }
-
