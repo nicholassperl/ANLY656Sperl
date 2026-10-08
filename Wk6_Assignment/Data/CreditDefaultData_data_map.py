@@ -1,7 +1,7 @@
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
 
 data_map = {
-    'Customer':        [DT.Interval, (0.99, 29998.01)],
+    'Customer':        [DT.Ignore, (0.99, 29998.01)],
     'Default':         [DT.Binary, (0, 1)],
     'card_class':      [DT.Nominal, (1, 2, 3)],
     'Gender':          [DT.Binary, (1.0, 2.0)],
