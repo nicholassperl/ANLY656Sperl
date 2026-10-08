@@ -5,8 +5,23 @@ Data map drafted by Tools/Data_Map_Tool.py from Data/CreditDefaultData.csv
 Target: Default (Binary 0/1)
 Reviewed: Customer=Ignore (ID), Education=Nominal (kept).
 """
+# ANSI color codes
+RED   = "\033[38;5;197m"; GOLD  = "\033[38;5;185m"; TEAL  = "\033[38;5;50m"
+GREEN = "\033[38;5;82m";  RESET = "\033[0m"
 
+import pandas as pd
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
+
+def print_boundary(lbl, b_width=60):
+    print("")
+    margin = b_width - len(lbl) - 2
+    lmargin = int(margin / 2)
+    rmargin = lmargin
+    if lmargin + rmargin < margin:
+        lmargin += 1
+    print(f"{TEAL}", "=" * b_width, f"{RESET}")
+    print(f"{GREEN}", lmargin * "*", lbl, rmargin * "*", f"{RESET}")
+    print(f"{TEAL}", "=" * b_width, f"{RESET}")
 
 data_map = {
     'Customer':        [DT.Ignore, (0.99, 29998.01)],
@@ -42,3 +57,47 @@ data_map = {
     'Feb_PayPercent':  [DT.Interval, (-0.01, 1.01)],
     'Jan_PayPercent':  [DT.Interval, (-0.01, 1.01)],
 }
+
+# Step 1: Read the data
+lbl = "Step 1: Reading Credit Default Data"
+print_boundary(lbl)
+df = pd.read_csv("Data/CreditDefaultData.csv")
+print(f"{GOLD}Data loaded: {df.shape[0]} observations and {df.shape[1]} columns.{RESET}")
+
+# Step 2: Create data map and apply ReplaceImputeEncode
+lbl = "Step 2: ReplaceImputeEncode (RIE) Processing"
+print_boundary(lbl)
+
+print(f"{GOLD}")
+print(15 * "=", "DATA MAP", 15 * "=")
+lk = len(max(data_map, key=len)) + 1
+ignored = 0
+for col, (dt_type, valid_values) in data_map.items():
+    if dt_type.name == "ID" or dt_type.name == "Ignore":
+        ignored += 1
+    print(f"  {TEAL}{col:.<{lk}s} {GOLD}{dt_type.name:9s}{GREEN}{valid_values}")
+print(f"{GOLD} === Data Map has{RED}", len(data_map) - ignored,
+      f"{GOLD}attribute columns", 3 * "=", f"{RESET}")
+
+target = "Default"
+print(f"{GOLD}")
+rie = ReplaceImputeEncode(data_map=data_map,
+                          interval_scale=None,  # No Interval Scaling
+                          no_impute=[target],   # Do not impute target
+                          binary_encoding="one-hot",
+                          nominal_encoding="one-hot",
+                          drop=False,           # Keep all columns
+                          display=True)
+
+encoded_df = rie.fit_transform(df)
+print(f"\n{RED}encoded_df    {RESET}:",
+      f"{encoded_df.shape[0]} cases and",
+      f"{encoded_df.shape[1]} columns,\n",
+      "               including target.")
+
+print(f"\n{GOLD}Target {RED}'{target}'{GOLD} class counts:")
+counts = encoded_df[target].value_counts()
+for cls, n_cls in counts.items():
+    print(f"  {TEAL}{str(cls):.<15s}{GREEN}{n_cls:6d}",
+          f"{n_cls / len(encoded_df):6.1%}")
+print(f"{RESET}")
