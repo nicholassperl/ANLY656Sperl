@@ -10,7 +10,16 @@ RED   = "\033[38;5;197m"; GOLD  = "\033[38;5;185m"; TEAL  = "\033[38;5;50m"
 GREEN = "\033[38;5;82m";  RESET = "\033[0m"
 
 import pandas as pd
+import numpy as np
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
+from AdvancedAnalytics.Tree import tree_classifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Overfitting rule: validation MISC <= max_ratio * train MISC, OR gap <= max_gap
+max_ratio = 1.2
+max_gap = 0.005
 
 def print_boundary(lbl, b_width=60):
     print("")
@@ -22,6 +31,29 @@ def print_boundary(lbl, b_width=60):
     print(f"{TEAL}", "=" * b_width, f"{RESET}")
     print(f"{GREEN}", lmargin * "*", lbl, rmargin * "*", f"{RESET}")
     print(f"{TEAL}", "=" * b_width, f"{RESET}")
+
+def passes_rule(train_misc, val_misc):
+    return (val_misc <= max_ratio * train_misc) | \
+           (val_misc - train_misc <= max_gap)
+
+def print_summary(train_acc, val_acc):
+    train_misc = 1.0 - train_acc
+    val_misc = 1.0 - val_acc
+    ratio_acc = train_acc / val_acc if val_acc > 0 else np.inf
+    if train_misc > 0:
+        ratio_misc = val_misc / train_misc
+    elif val_misc > 0:
+        ratio_misc = np.inf
+    else:
+        ratio_misc = 1.0
+    print(f"{GREEN}{'TRAIN':>28s} {'VALIDATION':>11s} {'RATIO':>7s}")
+    color = GREEN if ratio_acc < 1.2 else RED
+    print(f"{GREEN} {'ACCURACY':.<20s}{GOLD}{train_acc:>7.4f}",
+          f"  {val_acc:>7.4f}   {color}{ratio_acc:>7.4f}{RESET}")
+    color = GREEN if passes_rule(train_misc, val_misc) else RED
+    print(f"{GREEN} {'MISCLASSIFICATION':.<20s}{GOLD}{train_misc:>7.4f}",
+          f"  {val_misc:>7.4f}   {color}{ratio_misc:>7.4f}{RESET}")
+    print(f"{TEAL}", "-" * 47, f"{RESET}")
 
 data_map = {
     'Customer':        [DT.Ignore, (0.99, 29998.01)],
@@ -100,4 +132,49 @@ counts = encoded_df[target].value_counts()
 for cls, n_cls in counts.items():
     print(f"  {TEAL}{str(cls):.<15s}{GREEN}{n_cls:6d}",
           f"{n_cls / len(encoded_df):6.1%}")
+print(f"{RESET}")
+
+# Step 3: Kitchen Sink Decision Tree Evaluation
+lbl = "Step 3: Kitchen Sink Decision Tree (Default Parameters)"
+print_boundary(lbl)
+
+y = encoded_df[target]
+X = encoded_df.drop(target, axis=1)
+
+# Default parameters: no depth limit; leaves can hold a single case.
+print(f"{GOLD}Fitting kitchen sink tree using entire dataset")
+kitchen_sink_tree = DecisionTreeClassifier(random_state=12345)
+kitchen_sink_tree = kitchen_sink_tree.fit(X, y)
+tree_classifier.display_metrics(kitchen_sink_tree, X, y)
+print(f"{GOLD}Tree grew to depth {RED}{kitchen_sink_tree.get_depth()}{GOLD}",
+      f"with {RED}{kitchen_sink_tree.get_n_leaves()}{GOLD} leaves",
+      f"for {RED}{X.shape[0]}{GOLD} cases.")
+print(f"{RED}'Overfitting?'{RESET}")
+
+lbl = "70/30 Holdout Validation of Kitchen Sink Tree"
+print_boundary(lbl)
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3,
+                                                  stratify=y,
+                                                  random_state=12345)
+
+kitchen_sink_tree_cv = DecisionTreeClassifier(random_state=12345)
+kitchen_sink_tree_cv = kitchen_sink_tree_cv.fit(X_train, y_train)
+
+print(f"{GOLD}")
+tree_classifier.display_split_metrics(kitchen_sink_tree_cv,
+                                      X_train, y_train, X_val, y_val)
+
+train_pred = kitchen_sink_tree_cv.predict(X_train)
+val_pred = kitchen_sink_tree_cv.predict(X_val)
+train_acc = accuracy_score(y_train, train_pred)
+val_acc = accuracy_score(y_val, val_pred)
+
+lbl = "Kitchen Sink 70/30 Validation"
+print_boundary(lbl, 47)
+print_summary(train_acc, val_acc)
+
+print(f"{GOLD}\nTop 10 Feature Importance (from training data):")
+tree_classifier.display_importance(kitchen_sink_tree_cv, X.columns,
+                                   plot=False, top=10)
 print(f"{RESET}")
