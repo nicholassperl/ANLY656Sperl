@@ -7,7 +7,8 @@ Target: activity (nominal String: sitting, sittingdown, standing,
 Predictors: 1 binary (gender), 1 nominal (user), 16 interval
             (age, height, weight, BMI, x1-z4)
 Based on Templates/Random_Forest/Nominal_Forest/Nominal_RandomForest_Cellphone.py
-Steps complete: (1) data map, (2) RIE, (3) kitchen-sink RF, (4) tune.
+Steps complete: (1) data map, (2) RIE, (3) kitchen-sink RF,
+(4) tune, (5) holdout, (6) k-fold CV.
 """
 # ANSI color codes for output formatting
 RED   = "\033[38;5;197m"; GOLD  = "\033[38;5;185m"; TEAL  = "\033[38;5;50m"
@@ -21,11 +22,12 @@ import pandas as pd
 import numpy as np
 import time
 import math
+import warnings
 from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
 from AdvancedAnalytics.Forest import forest_classifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_validate
 from sklearn.metrics import accuracy_score
 
 
@@ -42,6 +44,42 @@ def print_boundary(lbl, b_width=60, boundary=True):
     print(f"{GREEN}", lmargin * "*", lbl, rmargin * "*", f"{RESET}")
     if boundary:
         print(f"{TEAL}", "=" * b_width, f"{RESET}")
+
+
+def print_acc_ratio(scores, n):
+    n_folds = len(scores["train_score"])
+    train_misc = (1.0 - scores["train_score"])
+    train_smisc = 2.0 * (1.0 - scores["train_score"]).std()
+    val_misc = (1.0 - scores["test_score"])
+    val_smisc = 2.0 * (1.0 - scores["test_score"]).std()
+    ratio_misc = np.zeros(n_folds)
+    for i in range(0, n_folds):
+        if train_misc[i] > 0:
+            ratio_misc[i] = val_misc[i] / train_misc[i]
+        elif val_misc[i] > 0:
+            ratio_misc[i] = np.inf
+        else:
+            ratio_misc[i] = 1.0
+    try:
+        s_ratio = 2.0 * ratio_misc.std()
+    except Exception:
+        s_ratio = np.nan
+    train_misc = train_misc.mean()
+    val_misc = val_misc.mean()
+    ratio = val_misc / train_misc if train_misc > 0 else np.inf
+    print(f"{TEAL}\n")
+    print(f" ====== {n_folds:.0f}-Fold Cross Validation =======")
+    print(f"  Train Avg. MISC..... {train_misc:.4f} +/-{train_smisc:.4f}")
+    print(f"  Test  Avg. MISC..... {val_misc:.4f} +/-{val_smisc:.4f}")
+    if s_ratio == np.nan or s_ratio == np.inf:
+        print(f"  Mean Misc Ratio..... {ratio:.4f}")
+    else:
+        print(f"  Mean Misc Ratio..... {ratio:.4f} +/-{s_ratio:.4f}")
+    print(" ", 39 * "=", f"{RESET}")
+    n_v = n * (1.0 / n_folds)
+    n_t = n - n_v
+    print(f"Equivalent to {n_folds:.0f} splits each with " +
+          f"{n_t:.0f}/{n_v:.0f} Cases")
 
 
 def print_summary(train_acc, val_acc):
@@ -351,4 +389,55 @@ imp_df['cumulative'] = imp_df['importance'].cumsum()
 print(f"{GOLD}")
 print(imp_df.to_string(index=False))
 print(f"{RESET}")
-print(f"{GOLD}Step 4 complete. Stopping before holdout validation (Step 5).{RESET}")
+
+# Step 5: Holdout Validation (70/30 split) - Selected Features
+lbl = "Step 5: Holdout Validation (Selected Features)"
+print_boundary(lbl)
+
+Xt, Xv, yt, yv = train_test_split(X_selected, y, test_size=0.3,
+                                  stratify=y, random_state=RANDOM_STATE)
+hold_out_forest = opt_forest
+hold_out_forest = hold_out_forest.fit(Xt, yt)
+print(f"{GOLD}")
+forest_classifier.display_split_metrics(hold_out_forest, Xt, yt, Xv, yv)
+print(f"{RESET}")
+
+train_pred = hold_out_forest.predict(Xt)
+val_pred = hold_out_forest.predict(Xv)
+train_acc = accuracy_score(yt, train_pred)
+val_acc = accuracy_score(yv, val_pred)
+
+lbl = "Holdout Validation Performance Summary (Selected Features)"
+print_boundary(lbl, 47)
+print_summary(train_acc, val_acc)
+
+print(f"{GOLD}\nFeature Importance (optimized model - selected features):")
+forest_classifier.display_importance(hold_out_forest, selected_features,
+                                     top='all', plot=True)
+
+# Step 6: K-Fold Cross Validation - Selected Features
+lbl = "Step 6: K-Fold Cross-Validation (Selected Features)"
+print_boundary(lbl)
+
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+n = X_selected.shape[0]
+best_val_acc = 0
+for k in range(2, 11):  # Test 2-fold through 10-fold CV
+    scores = cross_validate(opt_forest, X_selected, y,
+                            scoring='accuracy', cv=k, return_train_score=True)
+    train_acc = scores["train_score"].mean()
+    val_acc = scores["test_score"].mean()
+
+    print_acc_ratio(scores, n)
+    if val_acc > best_val_acc:
+        best_k = k
+        best_train_acc = train_acc
+        best_val_acc = val_acc
+
+print(f"\n{GOLD} Best K :",
+      f"{RED}{best_k}-Fold{GOLD}")
+lbl = "K-Fold Cross-Validation Performance Summary (Selected Features)"
+print_boundary(lbl, 47)
+print_summary(best_train_acc, best_val_acc)
+lbl = "Random Forest Analysis Complete"
+print_boundary(lbl)
