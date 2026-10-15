@@ -1,0 +1,26 @@
+We are building a Random Forest model to identify a cellphone user's activity
+in a building from phone sensor readings. Our data is in the Data folder called
+"CellphoneActivity.csv". The target is nominal "activity"
+('sitting', 'sittingdown', 'standing', 'standingup', 'walking').
+There are 1 binary, 2 nominal, and 16 interval predictors.
+
+This is important because activity labels from phone sensors help identify what
+users are doing in a building (context for auditing or usage analysis).
+
+You are my assistant software engineer experienced at programming Python
+machine learning software. We are constructing this model together, step by step.
+Please do not get ahead of me and do not complete the whole assignment at once.
+Wait for instructions after completing each step.
+You may run and test code in your own environment. The AdvancedAnalytics package
+used in this course should be available from the Templates folder (or installed
+as needed). I may also run code in Spyder with the anly656 environment.
+
+Solution files: wk7_solution.py, wk7_output.txt, wk7_review.pdf.
+For faster hyperparameter optimization, OPTIMIZATION_SAMPLE = 0.1 may be used
+(stratified sample on the target).
+
+Start your work by reviewing the Nominal Random Forest cellphone template in
+Templates/Random_Forest/Nominal_Forest. Also review AdvancedAnalytics in the
+Templates folder, particularly ReplaceImputeEncode and the Forest methods.
+After reviewing these files, please let me know if you have any questions
+before starting step 1.
