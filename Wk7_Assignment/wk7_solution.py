@@ -7,7 +7,7 @@ Target: activity (nominal String: sitting, sittingdown, standing,
 Predictors: 1 binary (gender), 1 nominal (user), 16 interval
             (age, height, weight, BMI, x1-z4)
 Based on Templates/Random_Forest/Nominal_Forest/Nominal_RandomForest_Cellphone.py
-Step 1 only: data map (reviewed from class template + assignment PDF).
+Steps complete: (1) data map, (2) ReplaceImputeEncode.
 """
 # ANSI color codes for output formatting
 RED   = "\033[38;5;197m"; GOLD  = "\033[38;5;185m"; TEAL  = "\033[38;5;50m"
@@ -18,7 +18,7 @@ FEATURE_THRESHOLD   = 0.99  # Proportion of features to select for optimization
 OPTIMIZATION_SAMPLE = 0.1   # Stratified sample fraction for hyperparameter search
 
 import pandas as pd
-from AdvancedAnalytics.ReplaceImputeEncode import DT
+from AdvancedAnalytics.ReplaceImputeEncode import DT, ReplaceImputeEncode
 
 
 def print_boundary(lbl, b_width=60, boundary=True):
@@ -84,4 +84,30 @@ for col, (dt_type, valid_values) in data_map.items():
 print(f"{GOLD} === Data Map has{RED}", len(data_map) - ignored,
       f"{GOLD}attribute columns", 3 * "=", f"{RESET}")
 print(f"{GOLD}Target: activity (DT.String / nominal labels).{RESET}")
-print(f"{GOLD}Step 1 complete. Stopping before RIE / modeling.{RESET}")
+
+# Step 2: Apply ReplaceImputeEncode (RIE)
+lbl = "Step 2: ReplaceImputeEncode (RIE) Processing"
+print_boundary(lbl)
+
+target = "activity"
+print(f"{GOLD}Target variable: {target}")
+if data_map[target][0] == DT.String:
+    target_ = None
+else:
+    target_ = [target]
+
+rie = ReplaceImputeEncode(data_map=data_map,
+                          interval_scale=None,  # No standardization
+                          no_impute=target_,    # Don't impute target
+                          binary_encoding="one-hot",
+                          nominal_encoding="one-hot",
+                          drop=False,           # Keep all encoded columns
+                          display=True)
+
+encoded_df = rie.fit_transform(df)
+print(f"\n{RED}encoded_df:{GOLD}:",
+      f"{encoded_df.shape[0]} cases and",
+      f"{encoded_df.shape[1]} columns,\n",
+      "               including targets.")
+print(f"\n{GOLD}Preprocessing complete. Ready for next step.{RESET}")
+print(f"{GOLD}Step 2 complete. Stopping before kitchen-sink forest.{RESET}")
