@@ -1,0 +1,544 @@
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ************* Step 1: Reading Data and Data Map ************ [0m
+[38;5;50m ============================================================ [0m
+[38;5;185mData loaded: 165633  observations and 19 columns.[0m
+
+[38;5;185mFirst 5 rows of the data:[0m
+     user gender  age  height  weight   BMI  ...   y3  z3   x4   y4   z4  activity
+0  debora  Woman   46    1.62      75  28.6  ...  104 -92 -150 -103 -147   sitting
+1  debora  Woman   46    1.62      75  28.6  ...  104 -90 -149 -104 -145   sitting
+2  debora  Woman   46    1.62      75  28.6  ...  104 -90 -151 -104 -144   sitting
+3  debora  Woman   46    1.62      75  28.6  ...  104 -89 -153 -103 -142   sitting
+4  debora  Woman   46    1.62      75  28.6  ...  104 -89 -153 -104 -143   sitting
+
+[5 rows x 19 columns]
+[38;5;185m
+=============== DATA MAP ===============
+  [38;5;50mactivity. [38;5;185mString   [38;5;82m('sitting', 'sittingdown', 'standing', 'standingup', 'walking')
+  [38;5;50muser..... [38;5;185mNominal  [38;5;82m('wallace', 'debora', 'katia', 'jose_carlos')
+  [38;5;50mgender... [38;5;185mBinary   [38;5;82m('Man', 'Woman')
+  [38;5;50mage...... [38;5;185mInterval [38;5;82m(20, 80)
+  [38;5;50mheight... [38;5;185mInterval [38;5;82m(1.5, 1.75)
+  [38;5;50mweight... [38;5;185mInterval [38;5;82m(50, 85)
+  [38;5;50mBMI...... [38;5;185mInterval [38;5;82m(20, 30)
+  [38;5;50mx1....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50my1....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mz1....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mx2....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50my2....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mz2....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mx3....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50my3....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mz3....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mx4....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50my4....... [38;5;185mInterval [38;5;82m(-750, 750)
+  [38;5;50mz4....... [38;5;185mInterval [38;5;82m(-750, 750)
+[38;5;185m === Data Map has[38;5;197m 19 [38;5;185mattribute columns === [0m
+[38;5;185mTarget: activity (DT.String / nominal labels).[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ******* Step 2: ReplaceImputeEncode (RIE) Processing ******* [0m
+[38;5;50m ============================================================ [0m
+[38;5;185mTarget variable: activity
+
+********** Data Preprocessing ***********
+Features Dictionary Contains:
+16 Interval, 
+1 Binary, 
+1 Nominal, and 
+1 Excluded Attribute(s).
+
+Data contains 165633 observations & 19 columns.
+
+
+Attribute Counts
+............... Missing  Outliers
+activity..         0         0
+user......         0         0
+gender....         0         0
+age.......         0         0
+height....         0         0
+weight....         0         0
+BMI.......         0         0
+x1........         0         0
+y1........         0         0
+z1........         0         0
+x2........         0         0
+y2........         0         0
+z2........         0         0
+x3........         0         0
+y3........         0         0
+z3........         0         0
+x4........         0         0
+y4........         0         0
+z4........         0         0
+
+[38;5;197mencoded_df:[38;5;185m: 165633 cases and 21 columns,
+                including targets.
+
+[38;5;185mPreprocessing complete. Ready for next step.[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ** Step 3: Kitchen Sink Random Forest (Default Parameters) * [0m
+[38;5;50m ============================================================ [0m
+[38;5;185mFitting kitchen sink random forest using entire dataset
+
+Model Metrics
+Observations...............    165633
+Features...................        21
+Trees in Forest............       100
+Maximum Tree Depth.........      None
+Minimum Leaf Size..........         1
+Minimum split Size.........         2
+ASE........................    0.0003
+Root ASE...................    0.0162
+Mean Absolute Error........    0.0032
+Accuracy...................    1.0000
+Precision..................    1.0000
+Recall (Sensitivity).......    1.0000
+F1-Score...................    1.0000
+Total Misclassifications...         0
+MISC (Misclassification)...      0.0%
+     class sitting.........      0.0%
+     class sittingdown.....      0.0%
+     class standing........      0.0%
+     class standingup......      0.0%
+     class walking.........      0.0%
+
+
+     Confusion
+       Matrix     Class 0   Class 1   Class 2   Class 3   Class 4  
+0 sitting......     50631         0         0         0         0
+1 sittingdown..         0     11827         0         0         0
+2 standing.....         0         0     47370         0         0
+3 standingup...         0         0         0     12415         0
+4 walking......         0         0         0         0     43390
+
+
+               precision    recall  f1-score   support
+
+     sitting       1.00      1.00      1.00     50631
+ sittingdown       1.00      1.00      1.00     11827
+    standing       1.00      1.00      1.00     47370
+  standingup       1.00      1.00      1.00     12415
+     walking       1.00      1.00      1.00     43390
+
+    accuracy                           1.00    165633
+   macro avg       1.00      1.00      1.00    165633
+weighted avg       1.00      1.00      1.00    165633
+
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ****** 70/30 Holdout Validation of Kitchen Sink Forest ***** [0m
+[38;5;50m ============================================================ [0m
+[38;5;185m
+
+
+Model Metrics..........       Training     Validation
+Observations...........         115943          49690
+Features...............             21             21
+Trees in Forest........            100            100
+Maximum Tree Depth.....           None           None
+Minimum Leaf Size......              1              1
+Minimum split Size.....              2              2
+Avg Squared Error......         0.0003         0.0021
+Root ASE...............         0.0174         0.0453
+Accuracy...............         1.0000         0.9966
+Precision..............         1.0000         0.9944
+Recall (Sensitivity)...         1.0000         0.9934
+F1-score...............         1.0000         0.9939
+Total Misclassifications...          0            170
+MISC (Misclassification)...       0.0%           0.3%
+     class sitting.........       0.0%           0.0%
+     class sittingdown.....       0.0%           1.0%
+     class standing........       0.0%           0.3%
+     class standingup......       0.0%           1.9%
+     class walking.........       0.0%           0.2%
+
+
+Training
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3   Class 4  
+0 sitting......     35442         0         0         0         0
+1 sittingdown..         0      8279         0         0         0
+2 standing.....         0         0     33159         0         0
+3 standingup...         0         0         0      8690         0
+4 walking......         0         0         0         0     30373
+
+
+Training 
+Metrics:
+               precision    recall  f1-score   support
+
+     sitting       1.00      1.00      1.00     35442
+ sittingdown       1.00      1.00      1.00      8279
+    standing       1.00      1.00      1.00     33159
+  standingup       1.00      1.00      1.00      8690
+     walking       1.00      1.00      1.00     30373
+
+    accuracy                           1.00    115943
+   macro avg       1.00      1.00      1.00    115943
+weighted avg       1.00      1.00      1.00    115943
+
+
+
+Validation
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3   Class 4  
+0 sitting......     15188         0         0         1         0
+1 sittingdown..         1      3513         6        18        10
+2 standing.....         0         0     14169         6        36
+3 standingup...         0        40        18      3656        11
+4 walking....../workspace/Wk7_Assignment/Templates/AdvancedAnalytics/Forest.py:220: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+         0         4        11         8     12994
+
+
+Validation 
+Metrics:
+               precision    recall  f1-score   support
+
+     sitting       1.00      1.00      1.00     15189
+ sittingdown       0.99      0.99      0.99      3548
+    standing       1.00      1.00      1.00     14211
+  standingup       0.99      0.98      0.99      3725
+     walking       1.00      1.00      1.00     13017
+
+    accuracy                           1.00     49690
+   macro avg       0.99      0.99      0.99     49690
+weighted avg       1.00      1.00      1.00     49690
+
+
+[38;5;50m =============================================== [0m
+[38;5;82m ******** Kitchen Sink 70/30 Validation ******** [0m
+[38;5;50m =============================================== [0m
+[38;5;82m                       TRAIN  VALIDATION   RATIO
+[38;5;82m ACCURACY............[38;5;185m 1.0000    0.9966   [38;5;82m 1.0034[0m
+[38;5;82m MISCLASSIFICATION...[38;5;185m 0.0000    0.0034   [38;5;197m    inf[0m
+[38;5;50m ----------------------------------------------- [0m
+[38;5;185m
+Top 10 Feature Importance (from training data):
+
+FEATURE.......... IMPORTANCE
+z1...............   0.1442
+z2...............   0.1229
+y3...............   0.1096
+y2...............   0.1025
+x4...............   0.0796
+z4...............   0.0645
+x2...............   0.0642
+z3...............   0.0641
+y1...............   0.0629
+y4...............   0.0519
+
+
+Feature Importances:
+[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m  Step 4.1: Feature Selection using Decision Tree Importance  [0m
+[38;5;50m ============================================================ [0m
+
+[38;5;82m            Feature Importance Analysis[38;5;185m
+===================================================
+Feature                     Importance   Cumulative  
+---------------------------------------------------
+z1........................... 0.3135        0.3135      
+y3........................... 0.1495        0.4630      
+y2........................... 0.1089        0.5719      
+z3........................... 0.0807        0.6526      
+z4........................... 0.0771        0.7297      
+x3........................... 0.0733        0.8030      
+z2........................... 0.0449        0.8480      
+y1........................... 0.0380        0.8859      
+x4........................... 0.0216        0.9075      
+age.......................... 0.0181        0.9256      
+x1........................... 0.0161        0.9418      
+BMI.......................... 0.0144        0.9562      
+x2........................... 0.0111        0.9673      
+user3:jose_carlo............. 0.0101        0.9774      
+y4........................... 0.0096        0.9870      
+weight....................... 0.0045        0.9915      
+[38;5;197m- - - - - - - - - - - - - - - - - - - - - - - - - [38;5;185m
+gender....................... 0.0033        0.9949      
+height....................... 0.0026        0.9974      
+user1:debora................. 0.0013        0.9987      
+user2:katia.................. 0.0009        0.9996      
+user0:wallace................ 0.0004        1.0000      
+===================================================
+
+[38;5;82mSelected 16 features accounting for  99% of importance
+[38;5;82mFeature selection complete - reduction:  [38;5;197m21 -→ 16 [38;5;82mfeatures[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ** Step 4.2: Case Reduction using Stratified Random Sample * [0m
+[38;5;50m ============================================================ [0m
+[38;5;82m
+Optimization Sample = 10.0%, using 16563 cases.[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m **** Step 4.3: Random Forest Hyperparameter Optimization *** [0m
+[38;5;50m ============================================================ [0m
+
+[38;5;50m =============================================== [0m
+[38;5;82m *************** Hyperparameters *************** [0m
+[38;5;50m =============================================== [0m
+[38;5;82m n_estimators........[38;5;185m[50, 100][0m
+[38;5;82m criterion...........[38;5;185m['gini', 'entropy'][0m
+[38;5;82m max_depth...........[38;5;185m[5, 7, 9, 11, 13][0m
+[38;5;82m min_samples_split...[38;5;185m[1648, 1652, 1656, 1660, 1664][0m
+[38;5;82m min_samples_leaf....[38;5;185m[824, 826, 828, 830, 832][0m
+[38;5;82m max_features........[38;5;185m[4, 6, 8, 10, 12, 14][0m
+
+[38;5;185mGrid Search: 3000 parameter combinations with
+4-fold CV requires 12000 total fits.
+
+Hyperparameter optimization uses only the top 99.0% of 
+features and 10.0% of the dataset.
+
+[38;5;185mSetting [38;5;197mn_jobs=-1[38;5;185m for faster calculations by using all available computer cores.[0m
+
+[38;5;82mStarting grid search...[0m
+/workspace/Wk7_Assignment/Templates/AdvancedAnalytics/Forest.py:220: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+[38;5;185mGrid search completed in 32 min. 31 sec.
+Average time per parameter combination  0.65 seconds[0m
+
+[38;5;50m =============================================== [0m
+[38;5;82m *********** Optimum Hyperparameters *********** [0m
+[38;5;50m =============================================== [0m
+[38;5;82m            criterion...........[38;5;185m   gini[0m
+[38;5;82m            max_depth...........[38;5;185m      7[0m
+[38;5;82m            max_features........[38;5;185m      4[0m
+[38;5;82m            min_samples_leaf....[38;5;185m    824[0m
+[38;5;82m            min_samples_split...[38;5;185m   1652[0m
+[38;5;82m            n_estimators........[38;5;185m     50[0m
+
+[38;5;50m =============================================== [0m
+[38;5;82m ****** Optimum Forest Performance Metrics ***** [0m
+[38;5;50m =============================================== [0m
+[38;5;82m                       TRAIN  VALIDATION   RATIO
+[38;5;82m ACCURACY............[38;5;185m 0.7901    0.7893   [38;5;82m 1.0009[0m
+[38;5;82m MISCLASSIFICATION...[38;5;185m 0.2099    0.2107   [38;5;82m 1.0035[0m
+[38;5;50m ----------------------------------------------- [0m
+
+[38;5;50m =============================================== [0m
+[38;5;82m ******* Optimum Random Forest Importance ****** [0m
+[38;5;50m =============================================== [0m
+[38;5;185m
+         feature  importance  cumulative
+              z2    0.218343    0.218343
+              z1    0.198106    0.416449
+              y2    0.150839    0.567288
+              y3    0.092051    0.659339
+              x4    0.088033    0.747372
+              x2    0.081195    0.828566
+              y1    0.051117    0.879683
+              z4    0.050341    0.930025
+              x3    0.024541    0.954566
+              y4    0.018875    0.973441
+              z3    0.017502    0.990943
+             BMI    0.002820    0.993763
+          weight    0.002528    0.996291
+              x1    0.002188    0.998479
+             age    0.001521    1.000000
+user3:jose_carlo    0.000000    1.000000
+[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ****** Step 5: Holdout Validation (Selected Features) ****** [0m
+[38;5;50m ============================================================ [0m
+[38;5;185m
+
+
+Model Metrics..........       Training     Validation
+Observations...........         115943          49690
+Features...............             16             16
+Trees in Forest........             50             50
+Maximum Tree Depth.....              7              7
+Minimum Leaf Size......            824            824
+Minimum split Size.....           1652           1652
+Avg Squared Error......         0.0315         0.0319
+Root ASE...............         0.1775         0.1786
+Accuracy...............         0.9159         0.9132
+Precision..............         0.9011         0.8963
+Recall (Sensitivity)...         0.8121         0.8067
+F1-score...............         0.8367         0.8320
+Total Misclassifications...       9754           4315
+MISC (Misclassification)...       8.4%           8.7%
+     class sitting.........       0.3%           0.4%
+     class sittingdown.....      29.2%          31.1%
+     class standing........       2.0%           2.1%
+     class standingup......      57.2%          57.6%
+     class walking.........       5.2%           5.5%
+
+
+Training
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3   Class 4  
+0 sitting......     35318        48         0        71         5
+1 sittingdown..       870      5862       983       181       383
+2 standing.....         0         2     32510         8       639
+3 standingup...       579      1347      1733      3718      1313
+4 walking......         1        43      1542         6     28781
+
+
+Training 
+Metrics:
+               precision    recall  f1-score   support
+
+     sitting       0.96      1.00      0.98     35442
+ sittingdown       0.80      0.71      0.75      8279
+    standing       0.88      0.98      0.93     33159
+  standingup       0.93      0.43      0.59      8690
+     walking       0.92      0.95      0.94     30373
+
+    accuracy                           0.92    115943
+   macro avg       0.90      0.81      0.84    115943
+weighted avg       0.92      0.92      0.91    115943
+
+
+
+Validation
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3   Class 4  
+0 sitting......     15131        20         0        34         4
+1 sittingdown..       388      2445       450       105       160
+2 standing.....         1         2     13913         2       293
+3 standingup...       278       559       755      1579       554
+4 walking......         0        13       691         6     12307
+
+
+Validation 
+Metrics:
+               precision    recall  f1-score   support
+
+     sitting       0.96      1.00      0.98     15189
+ sittingdown       0.80      0.69      0.74      3548
+    standing       0.88      0.98      0.93     14211
+  standingup       0.91      0.42      0.58      3725
+     walking       0.92      0.95      0.93     13017
+
+    accuracy                           0.91     49690
+   macro avg       0.90      0.81      0.83     49690
+weighted avg       0.91      0.91      0.90     49690
+
+[0m
+
+[38;5;50m =============================================== [0m
+[38;5;82m  Holdout Validation Performance Summary (Selected Features)  [0m
+[38;5;50m =============================================== [0m
+[38;5;82m                       TRAIN  VALIDATION   RATIO
+[38;5;82m ACCURACY............[38;5;185m 0.9159    0.9132   [38;5;82m 1.0030[0m
+[38;5;82m MISCLASSIFICATION...[38;5;185m 0.0841    0.0868   [38;5;82m 1.0322[0m
+[38;5;50m ----------------------------------------------- [0m
+[38;5;185m
+Feature Importance (optimized model - selected features):
+
+FEATURE............. IMPORTANCE
+z2..................   0.1985
+z1..................   0.1669
+y3..................   0.1194
+y2..................   0.1176
+x4..................   0.0781
+y1..................   0.0655
+z4..................   0.0641
+x2..................   0.0601
+z3..................   0.0410
+y4..................   0.0282
+x3..................   0.0218
+x1..................   0.0135
+age.................   0.0111
+weight..............   0.0079
+BMI.................   0.0047
+user3:jose_carlo....   0.0016
+
+
+Feature Importances:
+
+[38;5;50m ============================================================ [0m
+[38;5;82m **** Step 6: K-Fold Cross-Validation (Selected Features) *** [0m
+[38;5;50m ============================================================ [0m
+[38;5;50m
+
+ ====== 2-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0625 +/-0.0148
+  Test  Avg. MISC..... 0.3010 +/-0.1547
+  Mean Misc Ratio..... 4.8184 +/-3.6653
+  ======================================= [0m
+Equivalent to 2 splits each with 82816/82816 Cases
+[38;5;50m
+
+ ====== 3-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0658 +/-0.0265
+  Test  Avg. MISC..... 0.2460 +/-0.0940
+  Mean Misc Ratio..... 3.7367 +/-2.5672
+  ======================================= [0m
+Equivalent to 3 splits each with 110422/55211 Cases
+[38;5;50m
+
+ ====== 4-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0757 +/-0.0248
+  Test  Avg. MISC..... 0.2137 +/-0.1815
+  Mean Misc Ratio..... 2.8237 +/-2.9091
+  ======================================= [0m
+Equivalent to 4 splits each with 124225/41408 Cases
+[38;5;50m
+
+ ====== 5-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0759 +/-0.0220
+  Test  Avg. MISC..... 0.2006 +/-0.1687
+  Mean Misc Ratio..... 2.6431 +/-3.0235
+  ======================================= [0m
+Equivalent to 5 splits each with 132506/33127 Cases
+[38;5;50m
+
+ ====== 6-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0778 +/-0.0210
+  Test  Avg. MISC..... 0.1969 +/-0.1739
+  Mean Misc Ratio..... 2.5316 +/-2.8513
+  ======================================= [0m
+Equivalent to 6 splits each with 138028/27606 Cases
+[38;5;50m
+
+ ====== 7-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0781 +/-0.0190
+  Test  Avg. MISC..... 0.1898 +/-0.2054
+  Mean Misc Ratio..... 2.4293 +/-3.5366
+  ======================================= [0m
+Equivalent to 7 splits each with 141971/23662 Cases
+[38;5;50m
+
+ ====== 8-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0790 +/-0.0162
+  Test  Avg. MISC..... 0.1820 +/-0.2391
+  Mean Misc Ratio..... 2.3047 +/-3.9194
+  ======================================= [0m
+Equivalent to 8 splits each with 144929/20704 Cases
+[38;5;50m
+
+ ====== 9-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0796 +/-0.0143
+  Test  Avg. MISC..... 0.1780 +/-0.2480
+  Mean Misc Ratio..... 2.2366 +/-3.6918
+  ======================================= [0m
+Equivalent to 9 splits each with 147229/18404 Cases
+[38;5;50m
+
+ ====== 10-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0793 +/-0.0124
+  Test  Avg. MISC..... 0.1403 +/-0.0846
+  Mean Misc Ratio..... 1.7700 +/-1.3125
+  ======================================= [0m
+Equivalent to 10 splits each with 149070/16563 Cases
+
+[38;5;185m Best K : [38;5;197m10-Fold[38;5;185m
+
+[38;5;50m =============================================== [0m
+[38;5;82m  K-Fold Cross-Validation Performance Summary (Selected Features)  [0m
+[38;5;50m =============================================== [0m
+[38;5;82m                       TRAIN  VALIDATION   RATIO
+[38;5;82m ACCURACY............[38;5;185m 0.9207    0.8597   [38;5;82m 1.0710[0m
+[38;5;82m MISCLASSIFICATION...[38;5;185m 0.0793    0.1403   [38;5;197m 1.7700[0m
+[38;5;50m ----------------------------------------------- [0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ************** Random Forest Analysis Complete ************* [0m
+[38;5;50m ============================================================ [0m
