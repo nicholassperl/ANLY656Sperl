@@ -1,0 +1,23 @@
+What: We want to predict and address causes of sleep deficit among software
+engineers. The data are in Data/sleep_rating.csv. The target is nominal
+sleep_deficit with four outcomes: 0-none, mild, moderate, and severe.
+Success means meeting the midterm Word doc: build log_reg.py, tree.py, and
+forest.py (plus their output files) and midterm_report.pdf, following the
+class Cursor checklist and RIE / template approach.
+
+Why: This is for my ANLY 656 midterm assignment.
+
+How: You are my assistant software engineer experienced at programming Python
+machine learning software. We are constructing this solution together, step by
+step. You may run each step, but check with me before moving to the next step.
+Do not get ahead of me. The AdvancedAnalytics package used in this course is
+available for this work.
+
+Start your work by reviewing the nominal-target templates:
+Templates/Logistic_Reg/nominal_logistic.py,
+Templates/Decision_Tree/Nominal_Target/Nominal_DecisionTree_Cellphone.py, and
+Templates/Random_Forest/Nominal_Forest/Nominal_RandomForest_Cellphone.py.
+Also review AdvancedAnalytics in the Templates folder, particularly
+ReplaceImputeEncode and the classifier helpers in Regression, Tree, and Forest.
+After reviewing these files, please let me know if you have any questions before
+starting step 1.

@@ -1,0 +1,76 @@
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ************* Step 1: Reading Sleep Rating Data ************ [0m
+[38;5;50m ============================================================ [0m
+[38;5;185mData loaded: [38;5;197m8500[38;5;185m observations [38;5;197m16 [38;5;185mcolumns.[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ******* Step 2: ReplaceImputeEncode (RIE) Processing ******* [0m
+[38;5;50m ============================================================ [0m
+[38;5;185m
+=============== DATA MAP ===============
+  [38;5;50mage...................... [38;5;185mInterval [38;5;82m(17.99, 65.01)
+  [38;5;50mgender................... [38;5;185mNominal  [38;5;82m('Female', 'Male', 'Non-Binary')
+  [38;5;50mbedtime_phone_minutes.... [38;5;185mInterval [38;5;82m(0.99, 180.01)
+  [38;5;50mscreen_brightness_pct.... [38;5;185mInterval [38;5;82m(9.99, 100.01)
+  [38;5;50mblue_light_filter_active. [38;5;185mBinary   [38;5;82m(0, 1)
+  [38;5;50mcaffeine_post_5pm_mg..... [38;5;185mInterval [38;5;82m(-0.01, 250.01)
+  [38;5;50mphysical_activity_min.... [38;5;185mInterval [38;5;82m(-0.01, 112.01)
+  [38;5;50msleep_latency_min........ [38;5;185mInterval [38;5;82m(5.99, 123.31)
+  [38;5;50mtotal_sleep_hours........ [38;5;185mInterval [38;5;82m(3.19, 9.81)
+  [38;5;50mdeep_sleep_pct........... [38;5;185mInterval [38;5;82m(8.09, 28.01)
+  [38;5;50mrem_sleep_pct............ [38;5;185mInterval [38;5;82m(9.59, 27.01)
+  [38;5;50mmorning_alarm_snoozes.... [38;5;185mInterval [38;5;82m(-0.01, 7.01)
+  [38;5;50msleep_deficit............ [38;5;185mString   [38;5;82m('0-none', 'mild', 'moderate', 'severe')
+  [38;5;50moccupation............... [38;5;185mNominal  [38;5;82m(1, 2, 3, 4, 5)
+  [38;5;50mfavorite_bedtime_app..... [38;5;185mNominal  [38;5;82m(1, 2, 3, 4, 5, 6)
+  [38;5;50mclock_type............... [38;5;185mNominal  [38;5;82m(1, 2, 3)
+[38;5;185m === Data Map has[38;5;197m 16 [38;5;185mattribute columns === [0m
+[38;5;185m
+
+********** Data Preprocessing ***********
+Features Dictionary Contains:
+10 Interval, 
+1 Binary, 
+4 Nominal, and 
+1 Excluded Attribute(s).
+
+Data contains 8500 observations & 16 columns.
+
+
+Attribute Counts
+............................... Missing  Outliers
+age.......................         0         0
+gender....................         0         0
+bedtime_phone_minutes.....         0         0
+screen_brightness_pct.....         0         0
+blue_light_filter_active..         0         0
+caffeine_post_5pm_mg......         0         0
+physical_activity_min.....         0         0
+sleep_latency_min.........         0         0
+total_sleep_hours.........         0         0
+deep_sleep_pct............         0         0
+rem_sleep_pct.............         0         0
+morning_alarm_snoozes.....         0         0
+sleep_deficit.............         0         0
+occupation................         0         0
+favorite_bedtime_app......         0         0
+clock_type................         0         0
+
+[38;5;197mencoded_df    [0m: 8500 cases and 29 columns,
+                including target.
+
+[38;5;185mTarget [38;5;197m'sleep_deficit'[38;5;185m class counts:
+  [38;5;50mmoderate.......[38;5;82m  4462   52.5%
+  [38;5;50mmild...........[38;5;82m  2004   23.6%
+  [38;5;50m0-none.........[38;5;82m  1387   16.3%
+  [38;5;50msevere.........[38;5;82m   647    7.6%
+[0m
+
+[38;5;185mPredictor columns ([38;5;197m28[38;5;185m):
+['age', 'bedtime_phone_minutes', 'screen_brightness_pct', 'caffeine_post_5pm_mg', 'physical_activity_min', 'sleep_latency_min', 'total_sleep_hours', 'deep_sleep_pct', 'rem_sleep_pct', 'morning_alarm_snoozes', 'blue_light_filter_active', 'gender0:Female', 'gender1:Male', 'gender2:Non-Binary', 'occupation1', 'occupation2', 'occupation3', 'occupation4', 'occupation5', 'favorite_bedtime_app1', 'favorite_bedtime_app2', 'favorite_bedtime_app3', 'favorite_bedtime_app4', 'favorite_bedtime_app5', 'favorite_bedtime_app6', 'clock_type1', 'clock_type2', 'clock_type3']
+[0m
+
+[38;5;50m ============================================================ [0m
+[38;5;82m ****** Step 2 Complete — Data Map and RIE Ready (tree) ***** [0m
+[38;5;50m ============================================================ [0m
