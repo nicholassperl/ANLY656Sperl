@@ -1,9 +1,9 @@
 # ANLY 656 Midterm — Project Context
 
 ## What / Why / How
-- **What:** Predict nominal `sleep_deficit` (`0-none`, `mild`, `moderate`, `severe`) from `Data/sleep_rating.csv` (8,500 rows, 16 columns). Deliver `log_reg.py`, `tree.py`, `forest.py` + outputs + `midterm_report.pdf`.
-- **Why:** Help identify causes of sleep deficit among software engineers so interventions can be targeted.
-- **How:** Step-by-step with Cursor; student runs code in Spyder/`anly656`. Follow `Cursor_Project_Checklist`.
+- **What:** Predict and address causes of sleep deficit among software engineers using `Data/sleep_rating.csv` (nominal target `sleep_deficit`: `0-none`, `mild`, `moderate`, `severe`). Success = deliverables in the midterm Word doc.
+- **Why:** For the ANLY 656 midterm assignment.
+- **How:** Agent may run each step, but must check with the student before the next step. Follow `Cursor_Project_Checklist` and class templates.
 
 ## Foundation completed
 1. Statement of Intent: `Notes/Initial_Prompt.txt`
