@@ -1,0 +1,30 @@
+We are building three ML classification programs to predict employee sleep deficit
+and identify its drivers. Our data are in the Data folder labeled “sleep_rating.csv”.
+The target is nominal “sleep_deficit” with four outcomes: none, mild, moderate, and
+severe (one level may appear as “0-none” or similar in the data).
+
+This midterm requires three Python programs that analyze the same data and purpose:
+log_reg.py (multinomial / logistic regression), tree.py (decision tree), and
+forest.py (random forest). Each model should help identify the likelihood an employee
+will encounter a sleep deficit and the attribute effects that contribute to it.
+
+This is important because sleep deficit among software engineers reduces health,
+productivity, and long-term well-being. Employers and employees can use the results
+to target interventions (for example phone use before bed, caffeine after 5pm,
+activity, sleep latency, and related behaviors) before deficits become severe.
+
+You are my assistant software engineer experienced at programming Python
+machine learning software. We are constructing this model together, step by step.
+Please do not get ahead of me. Wait for instructions after completing each step.
+I will run and test all code using my Python IDE, Spyder with the environment
+anly656. The AdvancedAnalytics package used in this course is installed in that
+environment.
+
+Start your work by reviewing the nominal-target templates:
+Templates/Logistic_Reg/nominal_logistic.py,
+Templates/Decision_Tree/Nominal_Target/Nominal_DecisionTree_Cellphone.py, and
+Templates/Random_Forest/Nominal_Forest/Nominal_RandomForest_Cellphone.py.
+Also review AdvancedAnalytics in the Templates folder, particularly
+ReplaceImputeEncode and the classifier helpers in Regression, Tree, and Forest.
+After reviewing these files, please let me know if you have any questions before
+starting step 1.
