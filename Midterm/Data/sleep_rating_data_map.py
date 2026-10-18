@@ -2,7 +2,9 @@
 # Reviewed for ANLY 656 Midterm (nominal target sleep_deficit).
 # No ID/Ignore columns (per exam). Target typed as DT.String so RIE
 # leaves class labels out of the encoded frame (matches class templates).
-# Question pending: morning_alarm_snoozes as Nominal (0-7) vs Interval.
+# Decision: morning_alarm_snoozes = Interval (count of snoozes, ordered).
+# Nominal one-hot still used for gender, occupation, favorite_bedtime_app,
+# clock_type. Target sleep_deficit = DT.String (class labels, not encoded).
 from AdvancedAnalytics.ReplaceImputeEncode import DT
 
 data_map = {
@@ -17,7 +19,7 @@ data_map = {
     'total_sleep_hours':         [DT.Interval, (3.19, 9.81)],
     'deep_sleep_pct':            [DT.Interval, (8.09, 28.01)],
     'rem_sleep_pct':             [DT.Interval, (9.59, 27.01)],
-    'morning_alarm_snoozes':     [DT.Nominal, (0, 1, 2, 3, 4, 5, 6, 7)],
+    'morning_alarm_snoozes':     [DT.Interval, (-0.01, 7.01)],
     'sleep_deficit':             [DT.String, ('0-none', 'mild', 'moderate', 'severe')],
     'occupation':                [DT.Nominal, (1, 2, 3, 4, 5)],
     'favorite_bedtime_app':      [DT.Nominal, (1, 2, 3, 4, 5, 6)],

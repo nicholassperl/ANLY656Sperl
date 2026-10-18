@@ -23,7 +23,7 @@
 - Tree: `Templates/Decision_Tree/Nominal_Target/Nominal_DecisionTree_Cellphone.py` (no interval scale; kitchen sink → grid → hold-out/CV)
 - Forest: `Templates/Random_Forest/Nominal_Forest/Nominal_RandomForest_Cellphone.py` (optional feature selection; grid on `n_estimators`/depth/leaf)
 
-## Pending decisions before Step 2 coding
-1. Keep `morning_alarm_snoozes` as Nominal (0–7) or treat as Interval?
-2. Confirm target as `DT.String` (template style) vs `DT.Nominal` + `no_encode`.
-3. Build order: `log_reg.py` → `tree.py` → `forest.py`?
+## Data map decisions
+1. `morning_alarm_snoozes` = **Interval** (count).
+2. `sleep_deficit` = **DT.String** (template style).
+3. Build order (default): `log_reg.py` → `tree.py` → `forest.py`.
