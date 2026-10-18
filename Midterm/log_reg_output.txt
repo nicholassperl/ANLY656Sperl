@@ -1,0 +1,409 @@
+
+ ============================================================ 
+ ******** Step 1: Reading Data and Preparing Data Map ******* 
+ ============================================================ 
+Data loaded: 8500 observations 16 columns.
+ =============== DATA MAP ===============
+  age...................... Interval (17.99, 65.01)
+  gender................... Nominal  ('Female', 'Male', 'Non-Binary')
+  bedtime_phone_minutes.... Interval (0.99, 180.01)
+  screen_brightness_pct.... Interval (9.99, 100.01)
+  blue_light_filter_active. Binary   (0, 1)
+  caffeine_post_5pm_mg..... Interval (-0.01, 250.01)
+  physical_activity_min.... Interval (-0.01, 112.01)
+  sleep_latency_min........ Interval (5.99, 123.31)
+  total_sleep_hours........ Interval (3.19, 9.81)
+  deep_sleep_pct........... Interval (8.09, 28.01)
+  rem_sleep_pct............ Interval (9.59, 27.01)
+  morning_alarm_snoozes.... Interval (-0.01, 7.01)
+  sleep_deficit............ String   ('0-none', 'mild', 'moderate', 'severe')
+  occupation............... Nominal  (1, 2, 3, 4, 5)
+  favorite_bedtime_app..... Nominal  (1, 2, 3, 4, 5, 6)
+  clock_type............... Nominal  (1, 2, 3)
+ === Data Map has 16 attribute columns === 
+
+ ============================================================ 
+ ******* Step 2: ReplaceImputeEncode (RIE) Processing ******* 
+ ============================================================ 
+
+
+********** Data Preprocessing ***********
+Features Dictionary Contains:
+10 Interval, 
+1 Binary, 
+4 Nominal, and 
+1 Excluded Attribute(s).
+
+Data contains 8500 observations & 16 columns.
+
+
+Attribute Counts
+............................... Missing  Outliers
+age.......................         0         0
+gender....................         0         0
+bedtime_phone_minutes.....         0         0
+screen_brightness_pct.....         0         0
+blue_light_filter_active..         0         0
+caffeine_post_5pm_mg......         0         0
+physical_activity_min.....         0         0
+sleep_latency_min.........         0         0
+total_sleep_hours.........         0         0
+deep_sleep_pct............         0         0
+rem_sleep_pct.............         0         0
+morning_alarm_snoozes.....         0         0
+sleep_deficit.............         0         0
+occupation................         0         0
+favorite_bedtime_app......         0         0
+clock_type................         0         0
+
+encoded_df created from sleep_rating.csv containing 8500 cases & 29  columns, including the target 'sleep_deficit'
+
+ ============================================================ 
+ * STEP 3: Multinomial Logistic Regression (All Attributes) * 
+ ============================================================ 
+
+Predicting 'sleep_deficit' using 'All' Attributes in encoded_df
+              precision    recall  f1-score   support
+
+      0-none       1.00      1.00      1.00      1387
+        mild       1.00      1.00      1.00      2004
+    moderate       0.98      0.98      0.98      4462
+      severe       0.88      0.87      0.87       647
+
+    accuracy                           0.98      8500
+   macro avg       0.96      0.96      0.96      8500
+weighted avg       0.98      0.98      0.98      8500
+
+
+Logistic Regression using 'ALL' attributes ****
+Accuracy for All Features Logistic Reg:  97.89%
+Total Misclassifications: 179/8500:   2.11%
+
+
+ ============================================================ 
+ * STEP 4: One-vs-Rest Logistic Regression (All Attributes) * 
+ ============================================================ 
+
+              precision    recall  f1-score   support
+
+      0-none       0.99      1.00      1.00      1387
+        mild       0.98      0.63      0.77      2004
+    moderate       0.82      0.99      0.90      4462
+      severe       0.94      0.63      0.75       647
+
+    accuracy                           0.88      8500
+   macro avg       0.93      0.81      0.85      8500
+weighted avg       0.89      0.88      0.87      8500
+
+                        SENSITIVITY (RECALL) BY DECISION RULE
+ CLASS.......... EVENT RATE  BINARY CUTOFF 0.5  ONE-VS-REST  MULTINOMIAL
+ 0-none.........    16.3%              99.7%        99.9%        99.7%
+ mild...........    23.6%               7.6%        63.5%        99.7%
+ moderate.......    52.5%              81.9%        98.7%        98.2%
+ severe.........     7.6%              86.6%        62.8%        86.6%
+
+ MODEL               ACCURACY          MISC
+ Multinomial........  97.89%        179/ 8500
+ One-vs-Rest........  87.88%       1030/ 8500
+Best model: Multinomial
+
+ ============================================================ 
+ **************** STEP 5: HOLD-OUT VALIDATION *************** 
+ ============================================================ 
+
+Predicting 'sleep_deficit' with the Multinomial model using 'All' Attributes
+
+
+Model Metrics..............   Training   Validation
+Observations...............      5950       2550
+Coefficients...............       116        116
+DF Error...................      5834       2434
+Iterations.................        12         12
+ASE........................    0.0074     0.0091
+Root ASE...................    0.0862     0.0954
+Mean Absolute Error........    0.0160     0.0179
+Accuracy...................    0.9802     0.9753
+Precision..................    0.9631     0.9622
+Recall (Sensitivity).......    0.9629     0.9504
+F1-score...................    0.9630     0.9560
+Total Misclassifications...       118         63
+MISC (Misclassification)...      2.0%       2.5%
+     class 0-none..........      0.1%       0.7%
+     class mild............      0.1%       1.0%
+     class moderate........      1.9%       1.6%
+     class severe..........     12.8%      16.5%
+
+
+Training
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3  
+0 0-none.......       970         1         0         0
+1 mild.........         0      1402         1         0
+2 moderate.....         0         0      3065        58
+3 severe.......         0         0        58       395
+
+
+Training 
+Metrics:
+               precision    recall  f1-score   support
+
+      0-none       1.00      1.00      1.00       971
+        mild       1.00      1.00      1.00      1403
+    moderate       0.98      0.98      0.98      3123
+      severe       0.87      0.87      0.87       453
+
+    accuracy                           0.98      5950
+   macro avg       0.96      0.96      0.96      5950
+weighted avg       0.98      0.98      0.98      5950
+
+
+
+Validation
+Confusion Matrix  Class 0   Class 1   Class 2   Class 3  
+0 0-none.......       413         3         0         0
+1 mild.........         3       595         3         0
+2 moderate.....         0         2      1317        20
+3 severe.......         0         0        32       162
+
+
+Validation 
+Metrics:
+               precision    recall  f1-score   support
+
+      0-none       0.99      0.99      0.99       416
+        mild       0.99      0.99      0.99       601
+    moderate       0.97      0.98      0.98      1339
+      severe       0.89      0.84      0.86       194
+
+    accuracy                           0.98      2550
+   macro avg       0.96      0.95      0.96      2550
+weighted avg       0.97      0.98      0.98      2550
+
+
+ CLASS.......... N (VAL)  TRAIN SENSITIVITY  VAL SENSITIVITY
+ 0-none.........    416              99.9%            99.3%
+ mild...........    601              99.9%            99.0%
+ moderate.......   1339              98.1%            98.4%
+ severe.........    194              87.2%            83.5%
+
+Warning Overfit more than 20%
+Misclassification overfit ratio (2.47%/1.98%):  1.25
+
+ ============================================================ 
+ ************** STEP 6: K-FOLD CROSS VALIDATION ************* 
+ ============================================================ 
+Best model: Multinomial
+
+
+ ====== 2-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0202 +/-0.0014
+  Test  Avg. MISC..... 0.0255 +/-0.0031
+  Mean Misc Ratio..... 1.2658 +/-0.2395
+  ======================================= 
+Equivalent to 2 splits each with 4250/4250 Cases
+
+
+ ====== 3-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0201 +/-0.0013
+  Test  Avg. MISC..... 0.0249 +/-0.0019
+  Mean Misc Ratio..... 1.2426 +/-0.1709
+  ======================================= 
+Equivalent to 3 splits each with 5667/2833 Cases
+
+
+ ====== 4-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0207 +/-0.0022
+  Test  Avg. MISC..... 0.0266 +/-0.0057
+  Mean Misc Ratio..... 1.2972 +/-0.4129
+  ======================================= 
+Equivalent to 4 splits each with 6375/2125 Cases
+
+
+ ====== 5-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0207 +/-0.0021
+  Test  Avg. MISC..... 0.0261 +/-0.0057
+  Mean Misc Ratio..... 1.2665 +/-0.3537
+  ======================================= 
+Equivalent to 5 splits each with 6800/1700 Cases
+
+
+ ====== 6-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0206 +/-0.0003
+  Test  Avg. MISC..... 0.0255 +/-0.0044
+  Mean Misc Ratio..... 1.2373 +/-0.2144
+  ======================================= 
+Equivalent to 6 splits each with 7083/1417 Cases
+
+
+ ====== 7-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0206 +/-0.0015
+  Test  Avg. MISC..... 0.0256 +/-0.0092
+  Mean Misc Ratio..... 1.2491 +/-0.4842
+  ======================================= 
+Equivalent to 7 splits each with 7286/1214 Cases
+
+
+ ====== 8-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0208 +/-0.0008
+  Test  Avg. MISC..... 0.0255 +/-0.0068
+  Mean Misc Ratio..... 1.2288 +/-0.3550
+  ======================================= 
+Equivalent to 8 splits each with 7438/1062 Cases
+
+
+ ====== 9-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0209 +/-0.0011
+  Test  Avg. MISC..... 0.0255 +/-0.0059
+  Mean Misc Ratio..... 1.2272 +/-0.3259
+  ======================================= 
+Equivalent to 9 splits each with 7556/944 Cases
+
+
+ ====== 10-Fold Cross Validation =======
+  Train Avg. MISC..... 0.0211 +/-0.0010
+  Test  Avg. MISC..... 0.0254 +/-0.0087
+  Mean Misc Ratio..... 1.2047 +/-0.4317
+  ======================================= 
+Equivalent to 10 splits each with 7650/850 Cases
+
+ ============================================================ 
+ ************ STEP 7: FINAL MODEL INTERPRETATION ************ 
+ ============================================================ 
+Final model: Multinomial logistic regression for 'sleep_deficit' (4 classes) using all 28 attributes.
+Hold-out validation misclassification: 2.5% (overfit ratio 1.25).
+10-fold CV misclassification: 2.5% (mean overfit ratio 1.20).
+
+ CLASS.......... VAL SENSITIVITY  MOST OFTEN MISTAKEN FOR
+ 0-none.........          99.3%  mild (0.7%)
+ mild...........          99.0%  moderate (0.5%)
+ moderate.......          98.4%  severe (1.5%)
+ severe.........          83.5%  moderate (16.5%)
+
+Multinomial coefficients (hold-out trained model):
+
+Coefficients for Target Class 0-none
+Intercept...............       -57.7730
+age.....................        -0.0260
+bedtime_phone_minutes...         0.3404
+screen_brightness_pct...         0.0185
+caffeine_post_5pm_mg....         0.0764
+physical_activity_min...        -0.0677
+sleep_latency_min.......        -0.7151
+total_sleep_hours.......       169.5543
+deep_sleep_pct..........         0.2271
+rem_sleep_pct...........         0.0754
+morning_alarm_snoozes...        -0.4932
+blue_light_filter_active         0.0992
+gender0:Female..........       -20.1850
+gender1:Male............       -20.3509
+gender2:Non-Binary......       -17.2371
+occupation1.............       -11.2247
+occupation2.............       -11.9718
+occupation3.............       -12.4855
+occupation4.............       -11.1000
+occupation5.............       -10.9910
+favorite_bedtime_app1...        -9.7362
+favorite_bedtime_app2...        -9.2819
+favorite_bedtime_app3...        -9.4659
+favorite_bedtime_app4...       -10.0363
+favorite_bedtime_app5...        -9.3879
+favorite_bedtime_app6...        -9.8647
+clock_type1.............       -21.1458
+clock_type2.............       -20.9855
+clock_type3.............       -15.6416
+
+Coefficients for Target Class mild
+Intercept...............         5.8108
+age.....................        -0.0295
+bedtime_phone_minutes...         0.4188
+screen_brightness_pct...        -0.1881
+caffeine_post_5pm_mg....         0.2022
+physical_activity_min...        -0.2158
+sleep_latency_min.......        -0.8976
+total_sleep_hours.......        39.5236
+deep_sleep_pct..........         0.2368
+rem_sleep_pct...........         0.0073
+morning_alarm_snoozes...        -0.4157
+blue_light_filter_active         0.1031
+gender0:Female..........         2.9142
+gender1:Male............         2.9717
+gender2:Non-Binary......        -0.0752
+occupation1.............         1.2373
+occupation2.............         1.3123
+occupation3.............         1.0092
+occupation4.............         1.2384
+occupation5.............         1.0135
+favorite_bedtime_app1...         0.6581
+favorite_bedtime_app2...         1.1994
+favorite_bedtime_app3...         0.8723
+favorite_bedtime_app4...         1.0124
+favorite_bedtime_app5...         1.2221
+favorite_bedtime_app6...         0.8465
+clock_type1.............         2.4683
+clock_type2.............         2.2735
+clock_type3.............         1.0690
+
+Coefficients for Target Class moderate
+Intercept...............        29.3120
+age.....................         0.0224
+bedtime_phone_minutes...        -0.4209
+screen_brightness_pct...        -0.1640
+caffeine_post_5pm_mg....        -0.4829
+physical_activity_min...         0.1349
+sleep_latency_min.......        -0.2583
+total_sleep_hours.......      -101.9404
+deep_sleep_pct..........         0.1359
+rem_sleep_pct...........        -0.0367
+morning_alarm_snoozes...        -0.6187
+blue_light_filter_active         0.2970
+gender0:Female..........         9.8324
+gender1:Male............        10.0134
+gender2:Non-Binary......         9.4663
+occupation1.............         5.7179
+occupation2.............         6.0250
+occupation3.............         6.5135
+occupation4.............         5.6678
+occupation5.............         5.3878
+favorite_bedtime_app1...         5.3130
+favorite_bedtime_app2...         4.7652
+favorite_bedtime_app3...         4.4861
+favorite_bedtime_app4...         5.0366
+favorite_bedtime_app5...         4.6956
+favorite_bedtime_app6...         5.0155
+clock_type1.............        10.5062
+clock_type2.............        10.4285
+clock_type3.............         8.3773
+
+Coefficients for Target Class severe
+Intercept...............        22.6502
+age.....................         0.0331
+bedtime_phone_minutes...        -0.3382
+screen_brightness_pct...         0.3335
+caffeine_post_5pm_mg....         0.2043
+physical_activity_min...         0.1485
+sleep_latency_min.......         1.8710
+total_sleep_hours.......      -107.1375
+deep_sleep_pct..........        -0.5998
+rem_sleep_pct...........        -0.0460
+morning_alarm_snoozes...         1.5276
+blue_light_filter_active        -0.4993
+gender0:Female..........         7.4384
+gender1:Male............         7.3658
+gender2:Non-Binary......         7.8460
+occupation1.............         4.2695
+occupation2.............         4.6344
+occupation3.............         4.9627
+occupation4.............         4.1938
+occupation5.............         4.5897
+favorite_bedtime_app1...         3.7652
+favorite_bedtime_app2...         3.3173
+favorite_bedtime_app3...         4.1075
+favorite_bedtime_app4...         3.9873
+favorite_bedtime_app5...         3.4702
+favorite_bedtime_app6...         4.0027
+clock_type1.............         8.1713
+clock_type2.............         8.2836
+clock_type3.............         6.1953
+
+ ============================================================ 
+ ***** Analysis of Sleep Deficit Logistic Reg. Complete ***** 
+ ============================================================ 
